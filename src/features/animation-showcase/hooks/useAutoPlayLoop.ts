@@ -37,8 +37,8 @@ const STATE_TO_STEP = [0, 1, 1, 2, 2];
 // Timing for each state transition (in milliseconds)
 const STATE_DURATIONS = [
   2500, // S0: Court initial display
-  2000, // S1: Card initial display
-  2500, // S2: Card animated text display
+  2500, // S1: Card initial display
+  700, // S2: Card animated text display (before scene2)
   2500, // S3: Cup initial display
   2500, // S4: Cup animated text display
 ];
