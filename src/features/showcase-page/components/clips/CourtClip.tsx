@@ -21,7 +21,7 @@ export interface CourtClipRef {
 }
 
 export const CourtClip = forwardRef<CourtClipRef, CourtClipProps>(
-  ({ width = 512, height = 512 }, ref) => {
+  ({ width, height }, ref) => {
     // Memoize layout to prevent recreation on every render
     const layout = useMemo(
       () => new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
@@ -79,8 +79,8 @@ export const CourtClip = forwardRef<CourtClipRef, CourtClipProps>(
     return (
       <div
         style={{
-          width,
-          height,
+          width: width ?? "100%",
+          height: height ?? "100%",
           backgroundColor: "transparent",
           display: "flex",
           alignItems: "center",

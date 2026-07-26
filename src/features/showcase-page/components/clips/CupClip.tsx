@@ -11,17 +11,17 @@ import {
 
 import { asset } from "@/lib/asset";
 
-interface CardClipProps {
+interface CupClipProps {
   width?: number;
   height?: number;
 }
 
-export interface CardClipRef {
+export interface CupClipRef {
   fire: (inputName: string) => void;
 }
 
-export const CardClip = forwardRef<CardClipRef, CardClipProps>(
-  ({ width = 512, height = 512 }, ref) => {
+export const CupClip = forwardRef<CupClipRef, CupClipProps>(
+  ({ width, height }, ref) => {
     // Memoize layout to prevent recreation on every render
     const layout = useMemo(
       () => new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
@@ -30,7 +30,7 @@ export const CardClip = forwardRef<CardClipRef, CardClipProps>(
 
     const { rive, RiveComponent } = useRive(
       {
-        src: asset("card.riv"),
+        src: asset("cup.riv"),
         autoplay: true,
         stateMachines: "StateMachine1",
         layout,
@@ -86,8 +86,8 @@ export const CardClip = forwardRef<CardClipRef, CardClipProps>(
     return (
       <div
         style={{
-          width,
-          height,
+          width: width ?? "100%",
+          height: height ?? "100%",
           backgroundColor: "transparent",
           display: "flex",
           alignItems: "center",
@@ -100,4 +100,4 @@ export const CardClip = forwardRef<CardClipRef, CardClipProps>(
   }
 );
 
-CardClip.displayName = "CardClip";
+CupClip.displayName = "CupClip";
