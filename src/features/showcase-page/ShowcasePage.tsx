@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { BuildDecisions } from "./components/BuildDecisions";
 import { ClipBays } from "./components/ClipBays";
@@ -13,6 +13,7 @@ import { SiteFooter } from "./components/SiteFooter";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 import { usePageVisible } from "./hooks/usePageVisible";
 import { useShowcaseLoop } from "./hooks/useShowcaseLoop";
+import type { ClipKey } from "./showcase-page.data";
 
 export function ShowcasePage() {
   const courtRef = useRef<CourtClipRef>(null);
@@ -22,13 +23,31 @@ export function ShowcasePage() {
   const isPageVisible = usePageVisible();
   const reducedMotion = useReducedMotion();
 
-  const { phase, driving, fireManual, goToPhase, pause, resume } = useShowcaseLoop({
-    courtRef,
-    cardRef,
-    cupRef,
-    enabled: isPageVisible,
-    reducedMotion,
+  const [nonce, setNonce] = useState<Record<ClipKey, number>>({
+    court: 0,
+    card: 0,
+    cup: 0,
   });
+
+  const remountClips = useCallback((keys: ClipKey[]) => {
+    setNonce((prev) => {
+      const next = { ...prev };
+      keys.forEach((key) => {
+        next[key] = prev[key] + 1;
+      });
+      return next;
+    });
+  }, []);
+
+  const { phase, driving, fireManual, goToPhase, notifyClipReady, pause, resume } =
+    useShowcaseLoop({
+      courtRef,
+      cardRef,
+      cupRef,
+      enabled: isPageVisible,
+      reducedMotion,
+      onRemount: remountClips,
+    });
 
   return (
     <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
@@ -39,7 +58,9 @@ export function ShowcasePage() {
         courtRef={courtRef}
         cardRef={cardRef}
         cupRef={cupRef}
+        nonce={nonce}
         onFire={fireManual}
+        onClipReady={notifyClipReady}
       />
       <DrivingLoop
         phase={phase}

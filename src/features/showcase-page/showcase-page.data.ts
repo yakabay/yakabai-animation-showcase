@@ -78,35 +78,47 @@ export const CLIP_SEQUENCE: Record<ClipKey, Array<[number, ClipTrigger]>> = {
   ],
 };
 
-// Which "phase" (S0-S4) is active at each point in the cycle.
+// Which step is active at each point in the cycle. The cycle opens on the
+// reset state, so the first entry starts at the score pick rather than at 0.
 export const PHASE_SCHEDULE: Array<[number, number]> = [
-  [0, 0],
-  [800, 1],
-  [2600, 2],
-  [4600, 3],
-  [8600, 4],
+  [800, 0],
+  [2600, 1],
+  [3300, 2],
+  [6400, 3],
+  [8900, 4],
 ];
 
 export const CYCLE_MS = 10200;
 
-// Manually jumping to a phase replays the triggers that would have put the
+/** Step index whose clips are all back at their initial state. */
+export const RESET_PHASE = 4;
+
+// Manually jumping to a step replays the triggers that would have put the
 // clips in that state, in order.
 export const PHASE_JUMP: Record<number, Array<[ClipKey, ClipTrigger]>> = {
   0: [
-    ["court", "finish"],
     ["card", "finish"],
     ["cup", "finish"],
+    ["court", "scene1"],
   ],
   1: [
-    ["court", "scene1"],
-    ["card", "finish"],
+    ["cup", "finish"],
+    ["card", "scene1"],
   ],
-  2: [["card", "scene1"]],
-  3: [
+  2: [
     ["card", "scene2"],
     ["cup", "scene1"],
   ],
-  4: [["cup", "scene2"]],
+  3: [["cup", "scene2"]],
+  4: [],
+};
+
+// Steps that can't be reached by firing triggers alone. These clips are torn
+// down and recreated so they start from a guaranteed clean state; any trigger
+// they own in PHASE_JUMP is held back until the new instance reports ready.
+export const PHASE_REMOUNT: Record<number, ClipKey[]> = {
+  0: ["court"],
+  4: ["court", "card", "cup"],
 };
 
 export const JUMP_STAGGER_MS = 260;
@@ -121,38 +133,38 @@ interface DrivingLoopStep {
 
 export const DRIVING_LOOP_STEPS: DrivingLoopStep[] = [
   {
-    id: "S0",
-    stepLabel: "Step 1",
-    title: "Court",
-    subtitle: "The match, before the pick",
-    arrow: "next",
-  },
-  {
     id: "S1",
-    stepLabel: "Step 2",
-    title: "Card",
-    subtitle: "A blank prediction card",
+    stepLabel: "Step 1",
+    title: "Score picked",
+    subtitle: "The exact result, set by set",
     arrow: "next",
   },
   {
     id: "S2",
-    stepLabel: "Step 3",
-    title: "Card filled",
-    subtitle: "The score written on it",
+    stepLabel: "Step 2",
+    title: "Card minted",
+    subtitle: "Your stake, locked to the pick",
     arrow: "next",
   },
   {
     id: "S3",
-    stepLabel: "Step 4",
+    stepLabel: "Step 3",
     title: "Pool",
     subtitle: "The entry fee joins the pot",
-    arrow: "loop",
+    arrow: "next",
   },
   {
     id: "S4",
-    stepLabel: "Step 5",
+    stepLabel: "Step 4",
     title: "Payout",
     subtitle: "Correct callers split it",
+    arrow: "loop",
+  },
+  {
+    id: "S5",
+    stepLabel: "Step 5",
+    title: "Reset",
+    subtitle: "Every clip returns to initial state",
     arrow: "none",
   },
 ];

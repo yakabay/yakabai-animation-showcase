@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import {
   Alignment,
   Fit,
@@ -14,6 +14,8 @@ import { asset } from "@/lib/asset";
 interface CourtClipProps {
   width?: number;
   height?: number;
+  /** Fires once the state machine triggers are bound and safe to call. */
+  onReady?: () => void;
 }
 
 export interface CourtClipRef {
@@ -21,7 +23,7 @@ export interface CourtClipRef {
 }
 
 export const CourtClip = forwardRef<CourtClipRef, CourtClipProps>(
-  ({ width, height }, ref) => {
+  ({ width, height, onReady }, ref) => {
     // Memoize layout to prevent recreation on every render
     const layout = useMemo(
       () => new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
@@ -61,6 +63,16 @@ export const CourtClip = forwardRef<CourtClipRef, CourtClipProps>(
       "finish",
       viewModelInstance
     );
+
+    const onReadyRef = useRef(onReady);
+    onReadyRef.current = onReady;
+
+    // The trigger callbacks exist before the file loads, so the view model
+    // instance is the only honest signal that a fire will land.
+    const ready = Boolean(viewModelInstance);
+    useEffect(() => {
+      if (ready) onReadyRef.current?.();
+    }, [ready]);
 
     useImperativeHandle(
       ref,

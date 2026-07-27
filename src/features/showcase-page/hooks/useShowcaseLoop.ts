@@ -5,7 +5,9 @@ import {
   CYCLE_MS,
   JUMP_STAGGER_MS,
   PHASE_JUMP,
+  PHASE_REMOUNT,
   PHASE_SCHEDULE,
+  RESET_PHASE,
   type ClipKey,
   type ClipTrigger,
 } from "../showcase-page.data";
@@ -20,6 +22,7 @@ interface UseShowcaseLoopProps {
   cupRef: RefObject<RiveRef | null>;
   enabled: boolean;
   reducedMotion: boolean;
+  onRemount: (keys: ClipKey[]) => void;
 }
 
 interface UseShowcaseLoopReturn {
@@ -27,6 +30,7 @@ interface UseShowcaseLoopReturn {
   driving: boolean;
   fireManual: (key: ClipKey, trigger: ClipTrigger) => void;
   goToPhase: (phase: number) => void;
+  notifyClipReady: (key: ClipKey) => void;
   pause: () => void;
   resume: () => void;
 }
@@ -37,8 +41,9 @@ export function useShowcaseLoop({
   cupRef,
   enabled,
   reducedMotion,
+  onRemount,
 }: UseShowcaseLoopProps): UseShowcaseLoopReturn {
-  const [phase, setPhase] = useState(0);
+  const [phase, setPhase] = useState(RESET_PHASE);
   const [driving, setDriving] = useState(false);
 
   const drivingRef = useRef(false);
@@ -46,7 +51,11 @@ export function useShowcaseLoop({
   const mountedRef = useRef(true);
   const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
   const refsRef = useRef({ court: courtRef, card: cardRef, cup: cupRef });
+  const onRemountRef = useRef(onRemount);
+  // Triggers waiting for a remounted clip to finish loading.
+  const pendingRef = useRef<Partial<Record<ClipKey, ClipTrigger>>>({});
   refsRef.current = { court: courtRef, card: cardRef, cup: cupRef };
+  onRemountRef.current = onRemount;
   reducedMotionRef.current = reducedMotion;
 
   const clearTimers = useCallback(() => {
@@ -108,13 +117,33 @@ export function useShowcaseLoop({
       setDriving(true);
       setPhase(targetPhase);
 
+      const remount = PHASE_REMOUNT[targetPhase] ?? [];
       const jumps = PHASE_JUMP[targetPhase] ?? [];
       const stagger = reducedMotionRef.current ? 0 : JUMP_STAGGER_MS;
-      jumps.forEach(([key, trigger], index) => {
-        later(() => fire(key, trigger), index * stagger);
+
+      let step = 0;
+      jumps.forEach(([key, trigger]) => {
+        if (remount.includes(key)) {
+          pendingRef.current[key] = trigger;
+          return;
+        }
+        later(() => fire(key, trigger), step * stagger);
+        step += 1;
       });
+
+      if (remount.length > 0) onRemountRef.current(remount);
     },
     [clearTimers, fire, later]
+  );
+
+  const notifyClipReady = useCallback(
+    (key: ClipKey) => {
+      const pending = pendingRef.current[key];
+      if (!pending) return;
+      delete pendingRef.current[key];
+      fire(key, pending);
+    },
+    [fire]
   );
 
   const pause = useCallback(() => {
@@ -127,10 +156,18 @@ export function useShowcaseLoop({
     clearTimers();
     drivingRef.current = false;
     setDriving(false);
-    setPhase(0);
+    setPhase(RESET_PHASE);
     (["court", "card", "cup"] as ClipKey[]).forEach((key) => fire(key, "finish"));
     later(cycle, 320);
   }, [clearTimers, fire, later, cycle]);
 
-  return { phase, driving, fireManual, goToPhase, pause, resume };
+  return {
+    phase,
+    driving,
+    fireManual,
+    goToPhase,
+    notifyClipReady,
+    pause,
+    resume,
+  };
 }

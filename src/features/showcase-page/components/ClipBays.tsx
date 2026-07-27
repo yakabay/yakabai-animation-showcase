@@ -16,14 +16,25 @@ interface ClipBaysProps {
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
+  /** Bumped per clip to force a fresh Rive instance. */
+  nonce: Record<ClipKey, number>;
   onFire: (key: ClipKey, trigger: ClipTrigger) => void;
+  onClipReady: (key: ClipKey) => void;
 }
 
-export function ClipBays({ phase, courtRef, cardRef, cupRef, onFire }: ClipBaysProps) {
+export function ClipBays({
+  phase,
+  courtRef,
+  cardRef,
+  cupRef,
+  nonce,
+  onFire,
+  onClipReady,
+}: ClipBaysProps) {
   const active: Record<ClipKey, boolean> = {
-    court: phase >= 0 && phase <= 1,
-    card: phase === 2,
-    cup: phase >= 3 && phase <= 4,
+    court: phase === 0,
+    card: phase === 1,
+    cup: phase === 2 || phase === 3,
   };
 
   const dividerClassName = "border-b border-[#1e2228] sm:border-r sm:border-b-0";
@@ -37,7 +48,11 @@ export function ClipBays({ phase, courtRef, cardRef, cupRef, onFire }: ClipBaysP
         onFire={(trigger) => onFire("court", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.court}>
-          <CourtClip ref={courtRef} />
+          <CourtClip
+            key={nonce.court}
+            ref={courtRef}
+            onReady={() => onClipReady("court")}
+          />
         </div>
       </ClipBay>
 
@@ -48,7 +63,11 @@ export function ClipBays({ phase, courtRef, cardRef, cupRef, onFire }: ClipBaysP
         onFire={(trigger) => onFire("card", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.card}>
-          <CardClip ref={cardRef} />
+          <CardClip
+            key={nonce.card}
+            ref={cardRef}
+            onReady={() => onClipReady("card")}
+          />
         </div>
       </ClipBay>
 
@@ -59,7 +78,11 @@ export function ClipBays({ phase, courtRef, cardRef, cupRef, onFire }: ClipBaysP
         onFire={(trigger) => onFire("cup", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.cup}>
-          <CupClip ref={cupRef} />
+          <CupClip
+            key={nonce.cup}
+            ref={cupRef}
+            onReady={() => onClipReady("cup")}
+          />
         </div>
       </ClipBay>
     </div>
