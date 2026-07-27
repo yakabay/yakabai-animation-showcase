@@ -25,9 +25,9 @@ interface UseShowcaseLoopProps {
 interface UseShowcaseLoopReturn {
   phase: number;
   driving: boolean;
-  lastFired: string;
   fireManual: (key: ClipKey, trigger: ClipTrigger) => void;
   goToPhase: (phase: number) => void;
+  pause: () => void;
   resume: () => void;
 }
 
@@ -40,7 +40,6 @@ export function useShowcaseLoop({
 }: UseShowcaseLoopProps): UseShowcaseLoopReturn {
   const [phase, setPhase] = useState(0);
   const [driving, setDriving] = useState(false);
-  const [lastFired, setLastFired] = useState("—");
 
   const drivingRef = useRef(false);
   const reducedMotionRef = useRef(reducedMotion);
@@ -98,7 +97,6 @@ export function useShowcaseLoop({
       drivingRef.current = true;
       setDriving(true);
       fire(key, trigger);
-      setLastFired(`${key}.riv → ${trigger}`);
     },
     [clearTimers, fire]
   );
@@ -115,12 +113,15 @@ export function useShowcaseLoop({
       jumps.forEach(([key, trigger], index) => {
         later(() => fire(key, trigger), index * stagger);
       });
-
-      const lastJump = jumps[jumps.length - 1];
-      if (lastJump) setLastFired(`${lastJump[0]}.riv → ${lastJump[1]}`);
     },
     [clearTimers, fire, later]
   );
+
+  const pause = useCallback(() => {
+    clearTimers();
+    drivingRef.current = true;
+    setDriving(true);
+  }, [clearTimers]);
 
   const resume = useCallback(() => {
     clearTimers();
@@ -131,5 +132,5 @@ export function useShowcaseLoop({
     later(cycle, 320);
   }, [clearTimers, fire, later, cycle]);
 
-  return { phase, driving, lastFired, fireManual, goToPhase, resume };
+  return { phase, driving, fireManual, goToPhase, pause, resume };
 }

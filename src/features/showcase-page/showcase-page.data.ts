@@ -23,7 +23,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     description: "Pick an upcoming match and predict the exact score by sets.",
     triggers: [
       { label: "scene1", trigger: "scene1" },
-      { label: "reset", trigger: "finish" },
+      { label: "end", trigger: "finish" },
     ],
   },
   card: {
@@ -34,7 +34,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     triggers: [
       { label: "scene1", trigger: "scene1" },
       { label: "scene2", trigger: "scene2" },
-      { label: "reset", trigger: "finish" },
+      { label: "end", trigger: "finish" },
     ],
   },
   cup: {
@@ -45,7 +45,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     triggers: [
       { label: "scene1", trigger: "scene1" },
       { label: "scene2", trigger: "scene2" },
-      { label: "reset", trigger: "finish" },
+      { label: "end", trigger: "finish" },
     ],
   },
 };
@@ -73,8 +73,8 @@ export const CLIP_SEQUENCE: Record<ClipKey, Array<[number, ClipTrigger]>> = {
   ],
   cup: [
     [4600, "scene1"],
-    [5700, "scene2"],
-    [8600, "finish"],
+    [6400, "scene2"],
+    [8900, "finish"],
   ],
 };
 
@@ -113,6 +113,7 @@ export const JUMP_STAGGER_MS = 260;
 
 interface DrivingLoopStep {
   id: string;
+  stepLabel: string;
   title: string;
   subtitle: string;
   arrow: "next" | "loop" | "none";
@@ -121,30 +122,35 @@ interface DrivingLoopStep {
 export const DRIVING_LOOP_STEPS: DrivingLoopStep[] = [
   {
     id: "S0",
+    stepLabel: "Step 1",
     title: "Court",
     subtitle: "The match, before the pick",
     arrow: "next",
   },
   {
     id: "S1",
+    stepLabel: "Step 2",
     title: "Card",
     subtitle: "A blank prediction card",
     arrow: "next",
   },
   {
     id: "S2",
+    stepLabel: "Step 3",
     title: "Card filled",
     subtitle: "The score written on it",
     arrow: "next",
   },
   {
     id: "S3",
+    stepLabel: "Step 4",
     title: "Pool",
     subtitle: "The entry fee joins the pot",
     arrow: "loop",
   },
   {
     id: "S4",
+    stepLabel: "Step 5",
     title: "Payout",
     subtitle: "Correct callers split it",
     arrow: "none",
@@ -167,7 +173,7 @@ export const BUILD_DECISIONS: BuildDecision[] = [
   },
   {
     title: "One state, many drivers",
-    body: "Autoplay and every button on this page write to the same phase state — a manual trigger takes over cleanly, and Resume auto picks the loop back up instead of fighting it.",
+    body: "Autoplay and every button on this page write to the same phase state — a manual trigger takes over cleanly, and Resume picks the loop back up instead of fighting it.",
   },
   {
     title: "Reduced motion respected",

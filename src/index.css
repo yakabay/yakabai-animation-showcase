@@ -33,3 +33,9 @@ body {
     opacity: 0.25;
   }
 }
+
+@keyframes borderRun {
+  to {
+    stroke-dashoffset: -270;
+  }
+}

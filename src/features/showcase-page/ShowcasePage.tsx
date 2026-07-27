@@ -22,7 +22,7 @@ export function ShowcasePage() {
   const isPageVisible = usePageVisible();
   const reducedMotion = useReducedMotion();
 
-  const { phase, driving, lastFired, fireManual, goToPhase, resume } = useShowcaseLoop({
+  const { phase, driving, fireManual, goToPhase, pause, resume } = useShowcaseLoop({
     courtRef,
     cardRef,
     cupRef,
@@ -32,8 +32,8 @@ export function ShowcasePage() {
 
   return (
     <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
-      <HeaderBar driving={driving} onResume={resume} />
-      <Hero lastFired={lastFired} />
+      <HeaderBar />
+      <Hero />
       <ClipBays
         phase={phase}
         courtRef={courtRef}
@@ -41,7 +41,13 @@ export function ShowcasePage() {
         cupRef={cupRef}
         onFire={fireManual}
       />
-      <DrivingLoop phase={phase} onJump={goToPhase} />
+      <DrivingLoop
+        phase={phase}
+        driving={driving}
+        onJump={goToPhase}
+        onPause={pause}
+        onResume={resume}
+      />
       <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-2">
         <BuildDecisions />
         <InsideTheFile />

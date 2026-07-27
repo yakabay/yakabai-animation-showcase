@@ -1,10 +1,6 @@
 import { HERO_SUBHEAD, HERO_TITLE } from "../showcase-page.data";
 
-interface HeroProps {
-  lastFired: string;
-}
-
-export function Hero({ lastFired }: HeroProps) {
+export function Hero() {
   return (
     <div className="flex flex-col gap-8 px-5 py-10 sm:flex-row sm:items-end sm:justify-between sm:gap-12 sm:px-14 sm:py-16 sm:pb-10">
       <div className="max-w-[760px]">
@@ -14,12 +10,6 @@ export function Hero({ lastFired }: HeroProps) {
         <p className="m-0 font-sans text-base leading-[1.6] text-[#8f97a1] sm:text-[19px]">
           {HERO_SUBHEAD}
         </p>
-      </div>
-      <div className="shrink-0 text-left sm:text-right">
-        <div className="mb-2 text-[11px] tracking-[0.16em] text-[#565d66] uppercase">
-          Last fired
-        </div>
-        <div className="text-sm text-[#22d3ee] sm:text-[15px]">{lastFired}</div>
       </div>
     </div>
   );
