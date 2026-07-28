@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import { EventType } from "@rive-app/canvas";
 import {
   Alignment,
   Fit,
@@ -16,6 +17,8 @@ interface CupClipProps {
   height?: number;
   /** Fires once the state machine triggers are bound and safe to call. */
   onReady?: () => void;
+  /** Named Rive event or state-change signal — used once proven terminal. */
+  onSignal?: (name: string) => void;
 }
 
 export interface CupClipRef {
@@ -23,7 +26,7 @@ export interface CupClipRef {
 }
 
 export const CupClip = forwardRef<CupClipRef, CupClipProps>(
-  ({ width, height, onReady }, ref) => {
+  ({ width, height, onReady, onSignal }, ref) => {
     // Memoize layout to prevent recreation on every render
     const layout = useMemo(
       () => new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
@@ -71,6 +74,8 @@ export const CupClip = forwardRef<CupClipRef, CupClipProps>(
 
     const onReadyRef = useRef(onReady);
     onReadyRef.current = onReady;
+    const onSignalRef = useRef(onSignal);
+    onSignalRef.current = onSignal;
 
     // The trigger callbacks exist before the file loads, so the view model
     // instance is the only honest signal that a fire will land.
@@ -78,6 +83,37 @@ export const CupClip = forwardRef<CupClipRef, CupClipProps>(
     useEffect(() => {
       if (ready) onReadyRef.current?.();
     }, [ready]);
+
+    // Log every event/state name so we can adopt only proven-terminal signals
+    // into CLIP_TERMINAL_SIGNALS later. Timers remain the default.
+    useEffect(() => {
+      if (!rive) return;
+
+      const onRiveEvent = (event: { data?: unknown }) => {
+        const data = event.data as { name?: string } | undefined;
+        const name = data?.name;
+        if (!name) return;
+        console.debug(`[cup] RiveEvent +${Math.round(performance.now())}ms`, name);
+        onSignalRef.current?.(name);
+      };
+
+      const onStateChange = (event: { data?: unknown }) => {
+        const names = event.data;
+        if (!Array.isArray(names)) return;
+        for (const name of names) {
+          if (typeof name !== "string") continue;
+          console.debug(`[cup] StateChange +${Math.round(performance.now())}ms`, name);
+          onSignalRef.current?.(name);
+        }
+      };
+
+      rive.on(EventType.RiveEvent, onRiveEvent);
+      rive.on(EventType.StateChange, onStateChange);
+      return () => {
+        rive.off(EventType.RiveEvent, onRiveEvent);
+        rive.off(EventType.StateChange, onStateChange);
+      };
+    }, [rive]);
 
     useImperativeHandle(
       ref,

@@ -59,115 +59,113 @@ export const CLIP_BOX_CLASSNAME: Record<ClipKey, string> = {
   cup: "h-[176px] w-[220px] sm:h-[224px] sm:w-[280px] lg:h-[256px] lg:w-[320px]",
 };
 
-// Trigger sequence each clip runs through during one autoplay cycle,
-// expressed as [delay-from-cycle-start-ms, trigger].
-export const CLIP_SEQUENCE: Record<ClipKey, Array<[number, ClipTrigger]>> = {
-  court: [
-    [800, "scene1"],
-    [8600, "finish"],
-  ],
-  card: [
-    [2600, "scene1"],
-    [3300, "scene2"],
-    [8600, "finish"],
-  ],
-  cup: [
-    [4600, "scene1"],
-    [6400, "scene2"],
-    [8900, "finish"],
-  ],
-};
+/** Ordered story beats — source of truth for transitions. */
+export const STORY_STEPS = [
+  "boot",
+  "courtScene1",
+  "cardScene1",
+  "cardScene2",
+  "cupScene1",
+  "cupScene2",
+  "reset",
+] as const;
 
-// Which step is active at each point in the cycle. The cycle opens on the
-// reset state, so the first entry starts at the score pick rather than at 0.
-export const PHASE_SCHEDULE: Array<[number, number]> = [
-  [800, 0],
-  [2600, 1],
-  [3300, 2],
-  [6400, 3],
-  [8900, 4],
-];
+export type StoryStep = (typeof STORY_STEPS)[number];
 
-export const CYCLE_MS = 10200;
+/** Story cursor. `running: true` = in progress; `false` = settled. */
+export type StepState = { step: StoryStep; running: boolean };
 
-/** Step index whose clips are all back at their initial state. */
-export const RESET_PHASE = 4;
+export const BOOT_STATE: StepState = { step: "boot", running: false };
 
-// Manually jumping to a step replays the triggers that would have put the
-// clips in that state, in order.
-export const PHASE_JUMP: Record<number, Array<[ClipKey, ClipTrigger]>> = {
-  0: [
-    ["card", "finish"],
-    ["cup", "finish"],
-    ["court", "scene1"],
-  ],
-  1: [
-    ["cup", "finish"],
-    ["card", "scene1"],
-  ],
-  2: [
-    ["card", "scene2"],
-    ["cup", "scene1"],
-  ],
-  3: [["cup", "scene2"]],
-  4: [],
-};
-
-// Steps that can't be reached by firing triggers alone. These clips are torn
-// down and recreated so they start from a guaranteed clean state; any trigger
-// they own in PHASE_JUMP is held back until the new instance reports ready.
-export const PHASE_REMOUNT: Record<number, ClipKey[]> = {
-  0: ["court"],
-  4: ["court", "card", "cup"],
-};
-
-export const JUMP_STAGGER_MS = 260;
-
-interface DrivingLoopStep {
-  id: string;
-  stepLabel: string;
-  title: string;
-  subtitle: string;
-  arrow: "next" | "loop" | "none";
+export function makeStepState(step: StoryStep, running: boolean): StepState {
+  return { step, running };
 }
 
-export const DRIVING_LOOP_STEPS: DrivingLoopStep[] = [
-  {
-    id: "S1",
-    stepLabel: "Step 1",
-    title: "Score picked",
-    subtitle: "The exact result, set by set",
-    arrow: "next",
+export function statesEqual(a: StepState, b: StepState): boolean {
+  return a.step === b.step && a.running === b.running;
+}
+
+export function nextStoryStep(step: StoryStep): StoryStep {
+  const index = STORY_STEPS.indexOf(step);
+  return STORY_STEPS[(index + 1) % STORY_STEPS.length];
+}
+
+export interface StepBeat {
+  clip: ClipKey;
+  trigger: ClipTrigger;
+}
+
+/** Rive fires for each story step (`boot` has none). */
+export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
+  boot: [],
+  courtScene1: [{ clip: "court", trigger: "scene1" }],
+  cardScene1: [{ clip: "card", trigger: "scene1" }],
+  cardScene2: [{ clip: "card", trigger: "scene2" }],
+  cupScene1: [{ clip: "cup", trigger: "scene1" }],
+  cupScene2: [{ clip: "cup", trigger: "scene2" }],
+  reset: [
+    { clip: "court", trigger: "finish" },
+    { clip: "card", trigger: "finish" },
+    { clip: "cup", trigger: "finish" },
+  ],
+};
+
+/**
+ * How long each step stays `running: true`.
+ * `boot` is the cycle-start pause; reset uses the longest finish duration.
+ */
+export const STEP_DURATION_MS: Record<StoryStep, number> = {
+  boot: 500,
+  courtScene1: 2500,
+  cardScene1: 1500,
+  cardScene2: 700,
+  cupScene1: 4000,
+  cupScene2: 4000,
+  reset: 1300,
+};
+
+/** Bay button → story step it requests. */
+export const CLICK_TO_STEP: Record<
+  ClipKey,
+  Partial<Record<ClipTrigger, StoryStep>>
+> = {
+  court: { scene1: "courtScene1", finish: "reset" },
+  card: {
+    scene1: "cardScene1",
+    scene2: "cardScene2",
+    finish: "reset",
   },
-  {
-    id: "S2",
-    stepLabel: "Step 2",
-    title: "Card minted",
-    subtitle: "Your stake, locked to the pick",
-    arrow: "next",
+  cup: {
+    scene1: "cupScene1",
+    scene2: "cupScene2",
+    finish: "reset",
   },
-  {
-    id: "S3",
-    stepLabel: "Step 3",
-    title: "Pool",
-    subtitle: "The entry fee joins the pot",
-    arrow: "next",
-  },
-  {
-    id: "S4",
-    stepLabel: "Step 4",
-    title: "Payout",
-    subtitle: "Correct callers split it",
-    arrow: "loop",
-  },
-  {
-    id: "S5",
-    stepLabel: "Step 5",
-    title: "Reset",
-    subtitle: "Every clip returns to initial state",
-    arrow: "none",
-  },
-];
+};
+
+/** Bay-tint lane per story step. `-1` = no tint (reset). */
+export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
+  boot: 0,
+  courtScene1: 0,
+  cardScene1: 1,
+  cardScene2: 1,
+  cupScene1: 2,
+  cupScene2: 2,
+  reset: -1,
+};
+
+/**
+ * Signals a .riv file reports when a scene ends. Only add a name once the
+ * console proves it arrives exactly when motion settles.
+ */
+export const CLIP_TERMINAL_SIGNALS: Partial<
+  Record<ClipKey, Partial<Record<StoryStep, string>>>
+> = {};
+
+/** Hold on reset settled before the next cycle's `boot` step. */
+export const CYCLE_TAIL_MS = 400;
+
+/** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
+export const BAY_TINT_TRANSITION_MS = 700;
 
 interface BuildDecision {
   title: string;
@@ -184,12 +182,12 @@ export const BUILD_DECISIONS: BuildDecision[] = [
     body: "Playback resumes from the state it left, so a returning visitor never walks in mid-beat.",
   },
   {
-    title: "One state, many drivers",
-    body: "Autoplay and every button on this page write to the same phase state — a manual trigger takes over cleanly, and Resume picks the loop back up instead of fighting it.",
+    title: "One story cursor",
+    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path.",
   },
   {
     title: "Reduced motion respected",
-    body: "The status dot stops pulsing and manual jumps fire together instead of staggering, all keyed off one prefers-reduced-motion check.",
+    body: "The status dot stops pulsing and cycle start/tail delays collapse to zero, all keyed off one prefers-reduced-motion check.",
   },
 ];
 

@@ -1,13 +1,20 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 
-import type { ClipTrigger } from "../showcase-page.data";
+import {
+  BAY_TINT_TRANSITION_MS,
+  type ClipTrigger,
+} from "../showcase-page.data";
 
 interface ClipBayProps {
   fileLabel: string;
   sizeLabel: string;
   description: string;
   triggers: Array<{ label: string; trigger: ClipTrigger }>;
-  active: boolean;
+  /** 0–1 soft wash strength; crossfades as autoplay focus moves. */
+  tint: number;
+  /** Derived from clip *Playing state. */
+  litTrigger?: ClipTrigger;
+  isTriggerLegal: (trigger: ClipTrigger) => boolean;
   borderClassName: string;
   onFire: (trigger: ClipTrigger) => void;
   children: ReactNode;
@@ -18,15 +25,24 @@ export function ClipBay({
   sizeLabel,
   description,
   triggers,
-  active,
+  tint,
+  litTrigger,
+  isTriggerLegal,
   borderClassName,
   onFire,
   children,
 }: ClipBayProps) {
+  const [pressing, setPressing] = useState<ClipTrigger | null>(null);
+
+  const clearPress = () => setPressing(null);
+
   return (
     <div
-      className={`flex min-w-0 flex-col gap-5 px-5 py-6 transition-colors duration-300 sm:px-8 sm:py-8 ${borderClassName}`}
-      style={{ backgroundColor: active ? "rgb(34 211 238 / .03)" : "transparent" }}
+      className={`flex min-w-0 flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 ${borderClassName}`}
+      style={{
+        backgroundColor: `rgb(34 211 238 / ${0.045 * tint})`,
+        transition: `background-color ${BAY_TINT_TRANSITION_MS}ms ease`,
+      }}
     >
       <div className="flex items-center justify-between">
         <span className="text-xs tracking-[0.16em] text-[#9aa2ad] uppercase">{fileLabel}</span>
@@ -42,16 +58,38 @@ export function ClipBay({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {triggers.map(({ label, trigger }) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => onFire(trigger)}
-            className="cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] text-[#c6cdd6] transition-colors hover:border-[#22d3ee] hover:text-[#22d3ee]"
-          >
-            {label}
-          </button>
-        ))}
+        {triggers.map(({ label, trigger }) => {
+          const lit = litTrigger === trigger;
+          const legal = isTriggerLegal(trigger);
+          const pressed = pressing === trigger;
+          return (
+            <button
+              key={label}
+              type="button"
+              onPointerDown={() => {
+                if (legal) setPressing(trigger);
+              }}
+              onPointerUp={clearPress}
+              onPointerLeave={clearPress}
+              onPointerCancel={clearPress}
+              onClick={() => {
+                if (!legal) return;
+                onFire(trigger);
+              }}
+              className={[
+                "cursor-pointer rounded-[5px] border px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out",
+                lit
+                  ? "border-[#22d3ee] bg-[#101318] text-[#22d3ee]"
+                  : "border-[#2a3038] bg-[#101318] text-[#c6cdd6] hover:border-[#22d3ee] hover:text-[#22d3ee]",
+                legal && pressed
+                  ? "scale-[0.97] translate-y-px border-[#22d3ee] bg-[#0a0e14] text-[#22d3ee] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
+                  : "",
+              ].join(" ")}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

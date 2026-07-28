@@ -1,87 +1,88 @@
 import type { RefObject } from "react";
 
 import {
+  bayTintWeight,
+  isTriggerLegal,
+  litTriggerForClip,
+} from "../clip-state";
+import {
   BAY_COPY,
   CLIP_BOX_CLASSNAME,
   type ClipKey,
   type ClipTrigger,
+  type StepState,
 } from "../showcase-page.data";
 import { ClipBay } from "./ClipBay";
 import { CardClip, type CardClipRef } from "./clips/CardClip";
 import { CourtClip, type CourtClipRef } from "./clips/CourtClip";
 import { CupClip, type CupClipRef } from "./clips/CupClip";
 
+const BAY_INDEX = { court: 0, card: 1, cup: 2 } as const;
+
 interface ClipBaysProps {
-  phase: number;
+  bayFocus: number;
+  stepState: StepState;
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
-  /** Bumped per clip to force a fresh Rive instance. */
-  nonce: Record<ClipKey, number>;
   onFire: (key: ClipKey, trigger: ClipTrigger) => void;
   onClipReady: (key: ClipKey) => void;
+  onClipSignal: (key: ClipKey, signal: string) => void;
 }
 
 export function ClipBays({
-  phase,
+  bayFocus,
+  stepState,
   courtRef,
   cardRef,
   cupRef,
-  nonce,
   onFire,
   onClipReady,
+  onClipSignal,
 }: ClipBaysProps) {
-  const active: Record<ClipKey, boolean> = {
-    court: phase === 0,
-    card: phase === 1,
-    cup: phase === 2 || phase === 3,
-  };
-
   const dividerClassName = "border-b border-[#1e2228] sm:border-r sm:border-b-0";
 
   return (
     <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-3">
       <ClipBay
         {...BAY_COPY.court}
-        active={active.court}
+        tint={bayTintWeight(BAY_INDEX.court, bayFocus)}
+        litTrigger={litTriggerForClip(stepState, "court")}
+        isTriggerLegal={(trigger) => isTriggerLegal("court", trigger, stepState)}
         borderClassName={dividerClassName}
         onFire={(trigger) => onFire("court", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.court}>
-          <CourtClip
-            key={nonce.court}
-            ref={courtRef}
-            onReady={() => onClipReady("court")}
-          />
+          <CourtClip ref={courtRef} onReady={() => onClipReady("court")} />
         </div>
       </ClipBay>
 
       <ClipBay
         {...BAY_COPY.card}
-        active={active.card}
+        tint={bayTintWeight(BAY_INDEX.card, bayFocus)}
+        litTrigger={litTriggerForClip(stepState, "card")}
+        isTriggerLegal={(trigger) => isTriggerLegal("card", trigger, stepState)}
         borderClassName={dividerClassName}
         onFire={(trigger) => onFire("card", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.card}>
-          <CardClip
-            key={nonce.card}
-            ref={cardRef}
-            onReady={() => onClipReady("card")}
-          />
+          <CardClip ref={cardRef} onReady={() => onClipReady("card")} />
         </div>
       </ClipBay>
 
       <ClipBay
         {...BAY_COPY.cup}
-        active={active.cup}
+        tint={bayTintWeight(BAY_INDEX.cup, bayFocus)}
+        litTrigger={litTriggerForClip(stepState, "cup")}
+        isTriggerLegal={(trigger) => isTriggerLegal("cup", trigger, stepState)}
         borderClassName=""
         onFire={(trigger) => onFire("cup", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.cup}>
           <CupClip
-            key={nonce.cup}
             ref={cupRef}
             onReady={() => onClipReady("cup")}
+            onSignal={(signal) => onClipSignal("cup", signal)}
           />
         </div>
       </ClipBay>
