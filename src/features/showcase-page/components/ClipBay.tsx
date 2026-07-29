@@ -14,7 +14,6 @@ interface ClipBayProps {
   tint: number;
   /** Derived from clip *Playing state. */
   litTrigger?: ClipTrigger;
-  isTriggerLegal: (trigger: ClipTrigger) => boolean;
   borderClassName: string;
   onFire: (trigger: ClipTrigger) => void;
   children: ReactNode;
@@ -27,7 +26,6 @@ export function ClipBay({
   triggers,
   tint,
   litTrigger,
-  isTriggerLegal,
   borderClassName,
   onFire,
   children,
@@ -60,20 +58,18 @@ export function ClipBay({
       <div className="flex flex-wrap gap-2">
         {triggers.map(({ label, trigger }) => {
           const lit = litTrigger === trigger;
-          const legal = isTriggerLegal(trigger);
           const pressed = pressing === trigger;
           return (
             <button
               key={label}
               type="button"
               onPointerDown={() => {
-                if (legal) setPressing(trigger);
+                setPressing(trigger);
               }}
               onPointerUp={clearPress}
               onPointerLeave={clearPress}
               onPointerCancel={clearPress}
               onClick={() => {
-                if (!legal) return;
                 onFire(trigger);
               }}
               className={[
@@ -81,7 +77,7 @@ export function ClipBay({
                 lit
                   ? "border-[#22d3ee] bg-[#101318] text-[#22d3ee]"
                   : "border-[#2a3038] bg-[#101318] text-[#c6cdd6] hover:border-[#22d3ee] hover:text-[#22d3ee]",
-                legal && pressed
+                pressed
                   ? "scale-[0.97] translate-y-px border-[#22d3ee] bg-[#0a0e14] text-[#22d3ee] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
                   : "",
               ].join(" ")}

@@ -23,7 +23,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     description: "Pick an upcoming match and predict the exact score by sets.",
     triggers: [
       { label: "scene1", trigger: "scene1" },
-      { label: "end", trigger: "finish" },
+      { label: "reset", trigger: "finish" },
     ],
   },
   card: {
@@ -34,7 +34,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     triggers: [
       { label: "scene1", trigger: "scene1" },
       { label: "scene2", trigger: "scene2" },
-      { label: "end", trigger: "finish" },
+      { label: "reset", trigger: "finish" },
     ],
   },
   cup: {
@@ -45,7 +45,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
     triggers: [
       { label: "scene1", trigger: "scene1" },
       { label: "scene2", trigger: "scene2" },
-      { label: "end", trigger: "finish" },
+      { label: "reset", trigger: "finish" },
     ],
   },
 };
@@ -116,11 +116,11 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
  */
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
   boot: 500,
-  courtScene1: 2500,
+  courtScene1: 2100,
   cardScene1: 1500,
-  cardScene2: 700,
-  cupScene1: 4000,
-  cupScene2: 4000,
+  cardScene2: 900,
+  cupScene1: 3700,
+  cupScene2: 4300,
   reset: 1300,
 };
 
@@ -183,7 +183,7 @@ export const BUILD_DECISIONS: BuildDecision[] = [
   },
   {
     title: "One story cursor",
-    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path.",
+    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path. Only cup enforces scene1 → scene2 → finish; court and card stay freely clickable.",
   },
   {
     title: "Reduced motion respected",

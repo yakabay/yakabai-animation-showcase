@@ -5,12 +5,14 @@ import {
   STEP_BEATS,
   STEP_DURATION_MS,
   makeStepState,
-  nextStoryStep,
   type ClipKey,
   type ClipTrigger,
   type StepState,
   type StoryStep,
 } from "./showcase-page.data";
+
+/** Next cup trigger allowed by its in-clip sequence. */
+export type CupPhase = "scene1" | "scene2" | "finish";
 
 export function isStepRunning(state: StepState): boolean {
   return state.running;
@@ -28,26 +30,63 @@ export function beatsFor(step: StoryStep) {
   return STEP_BEATS[step];
 }
 
-/** Bay button is legal only when it requests the next expected step. */
+export function createInitialClipReady(): Record<ClipKey, boolean> {
+  return { court: false, card: false, cup: false };
+}
+
+export function allClipsReady(ready: Record<ClipKey, boolean>): boolean {
+  return CLIP_KEYS.every((key) => ready[key]);
+}
+
+/**
+ * Legal click is per-clip. No busy/running lock in manual mode.
+ * Cup alone enforces scene1 → scene2 → finish.
+ */
 export function isTriggerLegal(
   clip: ClipKey,
   trigger: ClipTrigger,
-  state: StepState
+  cupPhase: CupPhase
 ): boolean {
-  if (!isStepSettled(state)) return false;
-  const requested = CLICK_TO_STEP[clip][trigger];
-  if (!requested) return false;
-  return nextStoryStep(state.step) === requested;
+  if (!CLICK_TO_STEP[clip][trigger]) return false;
+  if (clip === "cup") return trigger === cupPhase;
+  return true;
 }
 
-/** Which trigger is lit on a bay, derived from the story cursor. */
+/** Advance cup sequence after a successful cup (or reset) fire. */
+export function cupPhaseAfterTrigger(trigger: ClipTrigger): CupPhase {
+  if (trigger === "scene1") return "scene2";
+  if (trigger === "scene2") return "finish";
+  return "scene1";
+}
+
+export function cupPhaseForStep(step: StoryStep): CupPhase | null {
+  if (step === "cupScene1") return cupPhaseAfterTrigger("scene1");
+  if (step === "cupScene2") return cupPhaseAfterTrigger("scene2");
+  if (step === "reset") return cupPhaseAfterTrigger("finish");
+  return null;
+}
+
+/**
+ * Which trigger is lit on a bay.
+ * Manual single-clip reset lights only that bay’s finish; otherwise from story.
+ */
 export function litTriggerForClip(
   state: StepState,
-  clip: ClipKey
+  clip: ClipKey,
+  manualResetClip?: ClipKey | null
 ): ClipTrigger | undefined {
+  if (manualResetClip) {
+    return clip === manualResetClip ? "finish" : undefined;
+  }
   if (!isStepRunning(state)) return undefined;
   const beat = beatsFor(state.step).find((b) => b.clip === clip);
   return beat?.trigger;
+}
+
+export function bayIndexForClip(clip: ClipKey): number {
+  if (clip === "court") return 0;
+  if (clip === "card") return 1;
+  return 2;
 }
 
 export function bayFocusForStep(state: StepState): number {
@@ -58,14 +97,6 @@ export function bayFocusForStep(state: StepState): number {
 export function bayTintWeight(clipIndex: number, focus: number): number {
   if (focus < 0) return 0;
   return Math.max(0, 1 - Math.abs(clipIndex - focus));
-}
-
-export function createInitialClipReady(): Record<ClipKey, boolean> {
-  return { court: false, card: false, cup: false };
-}
-
-export function allClipsReady(ready: Record<ClipKey, boolean>): boolean {
-  return CLIP_KEYS.every((key) => ready[key]);
 }
 
 export function settledState(step: StoryStep): StepState {

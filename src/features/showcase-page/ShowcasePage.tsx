@@ -25,6 +25,7 @@ export function ShowcasePage() {
     driving,
     bayFocus,
     stepState,
+    manualResetClip,
     requestTrigger,
     notifyClipReady,
     notifyClipSignal,
@@ -45,6 +46,7 @@ export function ShowcasePage() {
       <ClipBays
         bayFocus={bayFocus}
         stepState={stepState}
+        manualResetClip={manualResetClip}
         courtRef={courtRef}
         cardRef={cardRef}
         cupRef={cupRef}

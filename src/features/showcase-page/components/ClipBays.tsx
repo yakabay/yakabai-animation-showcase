@@ -2,7 +2,6 @@ import type { RefObject } from "react";
 
 import {
   bayTintWeight,
-  isTriggerLegal,
   litTriggerForClip,
 } from "../clip-state";
 import {
@@ -22,6 +21,7 @@ const BAY_INDEX = { court: 0, card: 1, cup: 2 } as const;
 interface ClipBaysProps {
   bayFocus: number;
   stepState: StepState;
+  manualResetClip: ClipKey | null;
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
@@ -33,6 +33,7 @@ interface ClipBaysProps {
 export function ClipBays({
   bayFocus,
   stepState,
+  manualResetClip,
   courtRef,
   cardRef,
   cupRef,
@@ -47,8 +48,7 @@ export function ClipBays({
       <ClipBay
         {...BAY_COPY.court}
         tint={bayTintWeight(BAY_INDEX.court, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "court")}
-        isTriggerLegal={(trigger) => isTriggerLegal("court", trigger, stepState)}
+        litTrigger={litTriggerForClip(stepState, "court", manualResetClip)}
         borderClassName={dividerClassName}
         onFire={(trigger) => onFire("court", trigger)}
       >
@@ -60,8 +60,7 @@ export function ClipBays({
       <ClipBay
         {...BAY_COPY.card}
         tint={bayTintWeight(BAY_INDEX.card, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "card")}
-        isTriggerLegal={(trigger) => isTriggerLegal("card", trigger, stepState)}
+        litTrigger={litTriggerForClip(stepState, "card", manualResetClip)}
         borderClassName={dividerClassName}
         onFire={(trigger) => onFire("card", trigger)}
       >
@@ -73,8 +72,7 @@ export function ClipBays({
       <ClipBay
         {...BAY_COPY.cup}
         tint={bayTintWeight(BAY_INDEX.cup, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "cup")}
-        isTriggerLegal={(trigger) => isTriggerLegal("cup", trigger, stepState)}
+        litTrigger={litTriggerForClip(stepState, "cup", manualResetClip)}
         borderClassName=""
         onFire={(trigger) => onFire("cup", trigger)}
       >
