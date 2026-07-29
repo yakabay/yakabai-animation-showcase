@@ -14,8 +14,16 @@ import {
   type StoryStep,
 } from "../showcase-page.types";
 
+/** Next court trigger allowed by its in-clip sequence. */
+export type CourtPhase = "scene1" | "finish";
+
 /** Next cup trigger allowed by its in-clip sequence. */
 export type CupPhase = "scene1" | "scene2" | "finish";
+
+export type ClipPhases = {
+  court: CourtPhase;
+  cup: CupPhase;
+};
 
 export function durationFor(step: StoryStep): number {
   return STEP_DURATION_MS[step];
@@ -41,17 +49,23 @@ function clipHasTrigger(clip: ClipKey, trigger: ClipTrigger): boolean {
 }
 
 /**
- * Legal click is per-clip. Court/card: any mapped trigger anytime.
- * Cup: cup phase only (scene1 → scene2 → finish).
+ * Legal click is per-clip. Card: any mapped trigger anytime.
+ * Court: scene1 → finish. Cup: scene1 → scene2 → finish.
  */
 export function isTriggerLegal(
   clip: ClipKey,
   trigger: ClipTrigger,
-  cupPhase: CupPhase
+  phases: ClipPhases
 ): boolean {
   if (!clipHasTrigger(clip, trigger)) return false;
-  if (clip === "cup") return trigger === cupPhase;
+  if (clip === "court") return trigger === phases.court;
+  if (clip === "cup") return trigger === phases.cup;
   return true;
+}
+
+export function courtPhaseAfterTrigger(trigger: ClipTrigger): CourtPhase {
+  if (trigger === "scene1") return "finish";
+  return "scene1";
 }
 
 /** Advance cup sequence after a successful cup (or reset) fire. */
@@ -59,6 +73,12 @@ export function cupPhaseAfterTrigger(trigger: ClipTrigger): CupPhase {
   if (trigger === "scene1") return "scene2";
   if (trigger === "scene2") return "finish";
   return "scene1";
+}
+
+export function courtPhaseForStep(step: StoryStep): CourtPhase | null {
+  if (step === "courtScene1") return courtPhaseAfterTrigger("scene1");
+  if (step === "reset") return courtPhaseAfterTrigger("finish");
+  return null;
 }
 
 export function cupPhaseForStep(step: StoryStep): CupPhase | null {

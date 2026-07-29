@@ -49,9 +49,9 @@ export const STEP_DURATION_MS: Record<StoryStep, number> = {
   courtScene1: 2100,
   cardScene1: 1500,
   cardScene2: 900,
-  cupScene1: 3700,
+  cupScene1: 3300,
   cupScene2: 4300,
-  reset: 1300,
+  reset: 700,
 };
 
 /** Bay scene button → story step (manual reset is separate). */
@@ -142,7 +142,7 @@ export const BUILD_DECISIONS: BuildDecision[] = [
   },
   {
     title: "One story cursor",
-    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path. Only cup enforces scene1 → scene2 → finish; court and card stay freely clickable.",
+    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path. Court and cup enforce in-clip sequences; card stays freely clickable.",
   },
   {
     title: "Reduced motion respected",

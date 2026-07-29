@@ -6,12 +6,16 @@ import {
   bayIndexForClip,
   beatsFor,
   createInitialClipReady,
+  courtPhaseAfterTrigger,
+  courtPhaseForStep,
   cupPhaseAfterTrigger,
   cupPhaseForStep,
   durationFor,
   isTriggerLegal,
   runningState,
   settledState,
+  type ClipPhases,
+  type CourtPhase,
   type CupPhase,
 } from "./useShowcaseLoop.utils";
 import {
@@ -56,11 +60,12 @@ export function useShowcaseLoop({
   const [stepState, setStepState] = useState<StepState>(BOOT_STATE);
   const [paused, setPaused] = useState(false);
   const [bayFocus, setBayFocus] = useState(0);
+  const [courtPhase, setCourtPhase] = useState<CourtPhase>("scene1");
   const [cupPhase, setCupPhase] = useState<CupPhase>("scene1");
   const [manualResetClip, setManualResetClip] = useState<ClipKey | null>(null);
 
   const stepStateRef = useRef(stepState);
-  const cupPhaseRef = useRef(cupPhase);
+  const clipPhasesRef = useRef<ClipPhases>({ court: "scene1", cup: "scene1" });
   const manualResetClipRef = useRef<ClipKey | null>(null);
   const clipsReadyRef = useRef(createInitialClipReady());
   const pausedRef = useRef(false);
@@ -75,7 +80,7 @@ export function useShowcaseLoop({
   reducedMotionRef.current = reducedMotion;
   enabledRef.current = enabled;
   stepStateRef.current = stepState;
-  cupPhaseRef.current = cupPhase;
+  clipPhasesRef.current = { court: courtPhase, cup: cupPhase };
   manualResetClipRef.current = manualResetClip;
   pausedRef.current = paused;
 
@@ -92,11 +97,15 @@ export function useShowcaseLoop({
     setStepState(state);
   }, []);
 
-  const bumpCupPhaseForStep = useCallback((step: StoryStep) => {
-    const next = cupPhaseForStep(step);
-    if (!next) return;
-    cupPhaseRef.current = next;
-    setCupPhase(next);
+  const bumpClipPhasesForStep = useCallback((step: StoryStep) => {
+    const nextCourt = courtPhaseForStep(step);
+    const nextCup = cupPhaseForStep(step);
+    const next = { ...clipPhasesRef.current };
+    if (nextCourt) next.court = nextCourt;
+    if (nextCup) next.cup = nextCup;
+    clipPhasesRef.current = next;
+    if (nextCourt) setCourtPhase(nextCourt);
+    if (nextCup) setCupPhase(nextCup);
   }, []);
 
   const scheduleAutoplayRef = useRef<() => void>(() => {});
@@ -128,7 +137,7 @@ export function useShowcaseLoop({
       const running = runningState(step);
       setStep(running);
       setBayFocus(bayFocusForStep(running));
-      bumpCupPhaseForStep(step);
+      bumpClipPhasesForStep(step);
 
       for (const beat of beatsFor(step)) {
         refsRef.current[beat.clip].current?.fire(beat.trigger);
@@ -140,7 +149,7 @@ export function useShowcaseLoop({
       }, duration);
     },
     [
-      bumpCupPhaseForStep,
+      bumpClipPhasesForStep,
       clearManualReset,
       clearStoryTimer,
       setStep,
@@ -165,11 +174,12 @@ export function useShowcaseLoop({
 
       refsRef.current[clip].current?.fire("finish");
 
-      if (clip === "cup") {
-        const next = cupPhaseAfterTrigger("finish");
-        cupPhaseRef.current = next;
-        setCupPhase(next);
-      }
+      const next = { ...clipPhasesRef.current };
+      if (clip === "court") next.court = courtPhaseAfterTrigger("finish");
+      if (clip === "cup") next.cup = cupPhaseAfterTrigger("finish");
+      clipPhasesRef.current = next;
+      if (clip === "court") setCourtPhase(next.court);
+      if (clip === "cup") setCupPhase(next.cup);
 
       storyTimerRef.current = setTimeout(() => {
         storyTimerRef.current = null;
@@ -254,7 +264,7 @@ export function useShowcaseLoop({
     (key: ClipKey, trigger: ClipTrigger) => {
       stopAutoplay();
 
-      if (!isTriggerLegal(key, trigger, cupPhaseRef.current)) {
+      if (!isTriggerLegal(key, trigger, clipPhasesRef.current)) {
         return;
       }
 
