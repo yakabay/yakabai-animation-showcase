@@ -1,9 +1,7 @@
 import { type ReactNode, useState } from "react";
 
-import {
-  BAY_TINT_TRANSITION_MS,
-  type ClipTrigger,
-} from "../showcase-page.data";
+import { BAY_TINT_TRANSITION_MS } from "../showcase-page.data";
+import type { ClipTrigger } from "../showcase-page.types";
 
 interface ClipBayProps {
   fileLabel: string;

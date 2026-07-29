@@ -3,14 +3,9 @@ import type { RefObject } from "react";
 import {
   bayTintWeight,
   litTriggerForClip,
-} from "../clip-state";
-import {
-  BAY_COPY,
-  CLIP_BOX_CLASSNAME,
-  type ClipKey,
-  type ClipTrigger,
-  type StepState,
-} from "../showcase-page.data";
+} from "../showcase-page.utils";
+import { BAY_COPY, CLIP_BOX_CLASSNAME } from "../showcase-page.data";
+import type { ClipKey, ClipTrigger, StepState } from "../showcase-page.types";
 import { ClipBay } from "./ClipBay";
 import { CardClip, type CardClipRef } from "./clips/CardClip";
 import { CourtClip, type CourtClipRef } from "./clips/CourtClip";
@@ -27,7 +22,6 @@ interface ClipBaysProps {
   cupRef: RefObject<CupClipRef | null>;
   onFire: (key: ClipKey, trigger: ClipTrigger) => void;
   onClipReady: (key: ClipKey) => void;
-  onClipSignal: (key: ClipKey, signal: string) => void;
 }
 
 export function ClipBays({
@@ -39,7 +33,6 @@ export function ClipBays({
   cupRef,
   onFire,
   onClipReady,
-  onClipSignal,
 }: ClipBaysProps) {
   const dividerClassName = "border-b border-[#1e2228] sm:border-r sm:border-b-0";
 
@@ -77,11 +70,7 @@ export function ClipBays({
         onFire={(trigger) => onFire("cup", trigger)}
       >
         <div className={CLIP_BOX_CLASSNAME.cup}>
-          <CupClip
-            ref={cupRef}
-            onReady={() => onClipReady("cup")}
-            onSignal={(signal) => onClipSignal("cup", signal)}
-          />
+          <CupClip ref={cupRef} onReady={() => onClipReady("cup")} />
         </div>
       </ClipBay>
     </div>

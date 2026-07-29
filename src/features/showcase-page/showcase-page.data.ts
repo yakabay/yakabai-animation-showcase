@@ -1,6 +1,85 @@
-export const CLIP_KEYS = ["court", "card", "cup"] as const;
-export type ClipKey = (typeof CLIP_KEYS)[number];
-export type ClipTrigger = "scene1" | "scene2" | "finish";
+import {
+  STORY_STEPS,
+  type BayCopy,
+  type BuildDecision,
+  type ClipKey,
+  type ClipTrigger,
+  type FileSpecRow,
+  type StepBeat,
+  type StepState,
+  type StoryStep,
+} from "./showcase-page.types";
+
+export const BOOT_STATE: StepState = { step: "boot", running: false };
+
+export function makeStepState(step: StoryStep, running: boolean): StepState {
+  return { step, running };
+}
+
+export function statesEqual(a: StepState, b: StepState): boolean {
+  return a.step === b.step && a.running === b.running;
+}
+
+export function nextStoryStep(step: StoryStep): StoryStep {
+  const index = STORY_STEPS.indexOf(step);
+  return STORY_STEPS[(index + 1) % STORY_STEPS.length];
+}
+
+/** Rive fires for each story step (`boot` has none). */
+export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
+  boot: [],
+  courtScene1: [{ clip: "court", trigger: "scene1" }],
+  cardScene1: [{ clip: "card", trigger: "scene1" }],
+  cardScene2: [{ clip: "card", trigger: "scene2" }],
+  cupScene1: [{ clip: "cup", trigger: "scene1" }],
+  cupScene2: [{ clip: "cup", trigger: "scene2" }],
+  reset: [
+    { clip: "court", trigger: "finish" },
+    { clip: "card", trigger: "finish" },
+    { clip: "cup", trigger: "finish" },
+  ],
+};
+
+/**
+ * How long each step stays `running: true`.
+ * `boot` is the cycle-start pause; reset uses the longest finish duration.
+ */
+export const STEP_DURATION_MS: Record<StoryStep, number> = {
+  boot: 500,
+  courtScene1: 2100,
+  cardScene1: 1500,
+  cardScene2: 900,
+  cupScene1: 3700,
+  cupScene2: 4300,
+  reset: 1300,
+};
+
+/** Bay scene button → story step (manual reset is separate). */
+export const SCENE_TO_STEP: Record<
+  ClipKey,
+  Partial<Record<Extract<ClipTrigger, "scene1" | "scene2">, StoryStep>>
+> = {
+  court: { scene1: "courtScene1" },
+  card: { scene1: "cardScene1", scene2: "cardScene2" },
+  cup: { scene1: "cupScene1", scene2: "cupScene2" },
+};
+
+/** Bay-tint lane per story step. `-1` = no tint (reset). */
+export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
+  boot: 0,
+  courtScene1: 0,
+  cardScene1: 1,
+  cardScene2: 1,
+  cupScene1: 2,
+  cupScene2: 2,
+  reset: -1,
+};
+
+/** Hold on reset settled before the next cycle's `boot` step. */
+export const CYCLE_TAIL_MS = 400;
+
+/** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
+export const BAY_TINT_TRANSITION_MS = 700;
 
 export const BRAND_NAME = "Yaroslav Kabai";
 export const BRAND_ROLE = "design engineer";
@@ -8,13 +87,6 @@ export const BRAND_ROLE = "design engineer";
 export const HERO_TITLE = "Interactive onboarding your users won't skip.";
 export const HERO_SUBHEAD =
   "Onboarding flow for an on-chain tennis prediction platform. Every scene is a live Rive state machine.";
-
-interface BayCopy {
-  fileLabel: string;
-  sizeLabel: string;
-  description: string;
-  triggers: Array<{ label: string; trigger: ClipTrigger }>;
-}
 
 export const BAY_COPY: Record<ClipKey, BayCopy> = {
   court: {
@@ -59,119 +131,6 @@ export const CLIP_BOX_CLASSNAME: Record<ClipKey, string> = {
   cup: "h-[176px] w-[220px] sm:h-[224px] sm:w-[280px] lg:h-[256px] lg:w-[320px]",
 };
 
-/** Ordered story beats — source of truth for transitions. */
-export const STORY_STEPS = [
-  "boot",
-  "courtScene1",
-  "cardScene1",
-  "cardScene2",
-  "cupScene1",
-  "cupScene2",
-  "reset",
-] as const;
-
-export type StoryStep = (typeof STORY_STEPS)[number];
-
-/** Story cursor. `running: true` = in progress; `false` = settled. */
-export type StepState = { step: StoryStep; running: boolean };
-
-export const BOOT_STATE: StepState = { step: "boot", running: false };
-
-export function makeStepState(step: StoryStep, running: boolean): StepState {
-  return { step, running };
-}
-
-export function statesEqual(a: StepState, b: StepState): boolean {
-  return a.step === b.step && a.running === b.running;
-}
-
-export function nextStoryStep(step: StoryStep): StoryStep {
-  const index = STORY_STEPS.indexOf(step);
-  return STORY_STEPS[(index + 1) % STORY_STEPS.length];
-}
-
-export interface StepBeat {
-  clip: ClipKey;
-  trigger: ClipTrigger;
-}
-
-/** Rive fires for each story step (`boot` has none). */
-export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
-  boot: [],
-  courtScene1: [{ clip: "court", trigger: "scene1" }],
-  cardScene1: [{ clip: "card", trigger: "scene1" }],
-  cardScene2: [{ clip: "card", trigger: "scene2" }],
-  cupScene1: [{ clip: "cup", trigger: "scene1" }],
-  cupScene2: [{ clip: "cup", trigger: "scene2" }],
-  reset: [
-    { clip: "court", trigger: "finish" },
-    { clip: "card", trigger: "finish" },
-    { clip: "cup", trigger: "finish" },
-  ],
-};
-
-/**
- * How long each step stays `running: true`.
- * `boot` is the cycle-start pause; reset uses the longest finish duration.
- */
-export const STEP_DURATION_MS: Record<StoryStep, number> = {
-  boot: 500,
-  courtScene1: 2100,
-  cardScene1: 1500,
-  cardScene2: 900,
-  cupScene1: 3700,
-  cupScene2: 4300,
-  reset: 1300,
-};
-
-/** Bay button → story step it requests. */
-export const CLICK_TO_STEP: Record<
-  ClipKey,
-  Partial<Record<ClipTrigger, StoryStep>>
-> = {
-  court: { scene1: "courtScene1", finish: "reset" },
-  card: {
-    scene1: "cardScene1",
-    scene2: "cardScene2",
-    finish: "reset",
-  },
-  cup: {
-    scene1: "cupScene1",
-    scene2: "cupScene2",
-    finish: "reset",
-  },
-};
-
-/** Bay-tint lane per story step. `-1` = no tint (reset). */
-export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
-  boot: 0,
-  courtScene1: 0,
-  cardScene1: 1,
-  cardScene2: 1,
-  cupScene1: 2,
-  cupScene2: 2,
-  reset: -1,
-};
-
-/**
- * Signals a .riv file reports when a scene ends. Only add a name once the
- * console proves it arrives exactly when motion settles.
- */
-export const CLIP_TERMINAL_SIGNALS: Partial<
-  Record<ClipKey, Partial<Record<StoryStep, string>>>
-> = {};
-
-/** Hold on reset settled before the next cycle's `boot` step. */
-export const CYCLE_TAIL_MS = 400;
-
-/** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
-export const BAY_TINT_TRANSITION_MS = 700;
-
-interface BuildDecision {
-  title: string;
-  body: string;
-}
-
 export const BUILD_DECISIONS: BuildDecision[] = [
   {
     title: "Exact pixel canvases",
@@ -190,11 +149,6 @@ export const BUILD_DECISIONS: BuildDecision[] = [
     body: "The status dot stops pulsing and cycle start/tail delays collapse to zero, all keyed off one prefers-reduced-motion check.",
   },
 ];
-
-interface FileSpecRow {
-  label: string;
-  value: string;
-}
 
 export const FILE_SPECS: FileSpecRow[] = [
   { label: "Runtime", value: "Rive · canvas renderer" },

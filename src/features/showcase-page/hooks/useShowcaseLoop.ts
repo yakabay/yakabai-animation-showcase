@@ -13,19 +13,15 @@ import {
   runningState,
   settledState,
   type CupPhase,
-} from "../clip-state";
+} from "./useShowcaseLoop.utils";
 import {
   BOOT_STATE,
-  CLIP_TERMINAL_SIGNALS,
   CYCLE_TAIL_MS,
-  CLICK_TO_STEP,
+  SCENE_TO_STEP,
   nextStoryStep,
   statesEqual,
-  type ClipKey,
-  type ClipTrigger,
-  type StepState,
-  type StoryStep,
 } from "../showcase-page.data";
+import type { ClipKey, ClipTrigger, StepState, StoryStep } from "../showcase-page.types";
 
 interface RiveRef {
   fire: (trigger: string) => void;
@@ -40,15 +36,12 @@ interface UseShowcaseLoopProps {
 }
 
 interface UseShowcaseLoopReturn {
-  /** True when autoplay is paused (manual / Pause). */
-  driving: boolean;
+  paused: boolean;
   bayFocus: number;
   stepState: StepState;
-  /** Bay whose reset button is lit during a manual single-clip reset. */
   manualResetClip: ClipKey | null;
   requestTrigger: (key: ClipKey, trigger: ClipTrigger) => void;
   notifyClipReady: (key: ClipKey) => void;
-  notifyClipSignal: (key: ClipKey, signal: string) => void;
   pause: () => void;
   resume: () => void;
 }
@@ -61,7 +54,7 @@ export function useShowcaseLoop({
   reducedMotion,
 }: UseShowcaseLoopProps): UseShowcaseLoopReturn {
   const [stepState, setStepState] = useState<StepState>(BOOT_STATE);
-  const [driving, setDriving] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [bayFocus, setBayFocus] = useState(0);
   const [cupPhase, setCupPhase] = useState<CupPhase>("scene1");
   const [manualResetClip, setManualResetClip] = useState<ClipKey | null>(null);
@@ -70,7 +63,7 @@ export function useShowcaseLoop({
   const cupPhaseRef = useRef(cupPhase);
   const manualResetClipRef = useRef<ClipKey | null>(null);
   const clipsReadyRef = useRef(createInitialClipReady());
-  const drivingRef = useRef(false);
+  const pausedRef = useRef(false);
   const reducedMotionRef = useRef(reducedMotion);
   const enabledRef = useRef(enabled);
   const mountedRef = useRef(true);
@@ -84,6 +77,7 @@ export function useShowcaseLoop({
   stepStateRef.current = stepState;
   cupPhaseRef.current = cupPhase;
   manualResetClipRef.current = manualResetClip;
+  pausedRef.current = paused;
 
   const clearStoryTimer = useCallback(() => {
     if (storyTimerRef.current) {
@@ -112,7 +106,7 @@ export function useShowcaseLoop({
       const current = stepStateRef.current;
       if (current.step !== step || !current.running) return;
       setStep(settledState(step));
-      if (!drivingRef.current && enabledRef.current) {
+      if (!pausedRef.current && enabledRef.current) {
         scheduleAutoplayRef.current();
       }
     },
@@ -188,18 +182,18 @@ export function useShowcaseLoop({
 
   const stopAutoplay = useCallback(() => {
     autoGenRef.current += 1;
-    drivingRef.current = true;
-    setDriving(true);
+    pausedRef.current = true;
+    setPaused(true);
   }, []);
 
   const scheduleAutoplay = useCallback(() => {
-    if (drivingRef.current || !enabledRef.current || !mountedRef.current) return;
+    if (pausedRef.current || !enabledRef.current || !mountedRef.current) return;
 
     const gen = ++autoGenRef.current;
 
     const stillAuto = () =>
       autoGenRef.current === gen &&
-      !drivingRef.current &&
+      !pausedRef.current &&
       enabledRef.current &&
       mountedRef.current;
 
@@ -252,7 +246,7 @@ export function useShowcaseLoop({
       autoGenRef.current += 1;
       return;
     }
-    if (drivingRef.current) return;
+    if (pausedRef.current) return;
     scheduleAutoplayRef.current();
   }, [enabled]);
 
@@ -269,7 +263,7 @@ export function useShowcaseLoop({
         return;
       }
 
-      const step = CLICK_TO_STEP[key][trigger];
+      const step = SCENE_TO_STEP[key][trigger];
       if (!step) return;
       enterStep(step);
     },
@@ -290,44 +284,25 @@ export function useShowcaseLoop({
     [enterStep]
   );
 
-  const notifyClipSignal = useCallback(
-    (key: ClipKey, signal: string) => {
-      const terminals = CLIP_TERMINAL_SIGNALS[key];
-      if (!terminals) return;
-      const current = stepStateRef.current;
-      if (!current.running) return;
-      for (const [step, name] of Object.entries(terminals) as Array<
-        [StoryStep, string]
-      >) {
-        if (name !== signal || current.step !== step) continue;
-        clearStoryTimer();
-        settleStory(step);
-        return;
-      }
-    },
-    [clearStoryTimer, settleStory]
-  );
-
   const pause = useCallback(() => {
     stopAutoplay();
   }, [stopAutoplay]);
 
   const resume = useCallback(() => {
     autoGenRef.current += 1;
-    drivingRef.current = false;
-    setDriving(false);
+    pausedRef.current = false;
+    setPaused(false);
     setBayFocus(bayFocusForStep(stepStateRef.current));
     scheduleAutoplay();
   }, [scheduleAutoplay]);
 
   return {
-    driving,
+    paused,
     bayFocus,
     stepState,
     manualResetClip,
     requestTrigger,
     notifyClipReady,
-    notifyClipSignal,
     pause,
     resume,
   };

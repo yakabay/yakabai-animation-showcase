@@ -22,13 +22,12 @@ export function ShowcasePage() {
   const reducedMotion = useReducedMotion();
 
   const {
-    driving,
+    paused,
     bayFocus,
     stepState,
     manualResetClip,
     requestTrigger,
     notifyClipReady,
-    notifyClipSignal,
     pause,
     resume,
   } = useShowcaseLoop({
@@ -42,7 +41,7 @@ export function ShowcasePage() {
   return (
     <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
       <HeaderBar />
-      <Hero driving={driving} onPause={pause} onResume={resume} />
+      <Hero paused={paused} onPause={pause} onResume={resume} />
       <ClipBays
         bayFocus={bayFocus}
         stepState={stepState}
@@ -52,7 +51,6 @@ export function ShowcasePage() {
         cupRef={cupRef}
         onFire={requestTrigger}
         onClipReady={notifyClipReady}
-        onClipSignal={notifyClipSignal}
       />
       <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-2">
         <BuildDecisions />

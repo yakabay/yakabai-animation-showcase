@@ -1,7 +1,7 @@
 import { HERO_SUBHEAD, HERO_TITLE } from "../showcase-page.data";
 
 interface HeroProps {
-  driving: boolean;
+  paused: boolean;
   onPause: () => void;
   onResume: () => void;
 }
@@ -9,7 +9,7 @@ interface HeroProps {
 const CONTROL_CLASS =
   "relative flex h-[34px] w-[108px] shrink-0 cursor-pointer items-center justify-center gap-1.5 self-end rounded-md border p-0 font-mono text-[11px] tracking-[0.14em] uppercase";
 
-export function Hero({ driving, onPause, onResume }: HeroProps) {
+export function Hero({ paused, onPause, onResume }: HeroProps) {
   return (
     <div className="flex flex-col gap-8 px-5 py-10 sm:flex-row sm:items-end sm:justify-between sm:gap-12 sm:px-14 sm:py-16 sm:pb-10">
       <div className="max-w-[760px]">
@@ -21,7 +21,7 @@ export function Hero({ driving, onPause, onResume }: HeroProps) {
         </p>
       </div>
 
-      {driving ? (
+      {paused ? (
         <button
           type="button"
           onClick={onResume}
