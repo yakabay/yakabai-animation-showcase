@@ -1,5 +1,4 @@
 import {
-  STORY_STEPS,
   type BayCopy,
   type BuildDecision,
   type ClipKey,
@@ -11,19 +10,6 @@ import {
 } from "./showcase-page.types";
 
 export const BOOT_STATE: StepState = { step: "boot", running: false };
-
-export function makeStepState(step: StoryStep, running: boolean): StepState {
-  return { step, running };
-}
-
-export function statesEqual(a: StepState, b: StepState): boolean {
-  return a.step === b.step && a.running === b.running;
-}
-
-export function nextStoryStep(step: StoryStep): StoryStep {
-  const index = STORY_STEPS.indexOf(step);
-  return STORY_STEPS[(index + 1) % STORY_STEPS.length];
-}
 
 /** Rive fires for each story step (`boot` has none). */
 export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {

@@ -1,5 +1,18 @@
 import { beatsFor } from "./hooks/useShowcaseLoop.utils";
-import type { ClipKey, ClipTrigger, StepState } from "./showcase-page.types";
+import { STORY_STEPS, type ClipKey, type ClipTrigger, type StepState, type StoryStep } from "./showcase-page.types";
+
+export function makeStepState(step: StoryStep, running: boolean): StepState {
+  return { step, running };
+}
+
+export function statesEqual(a: StepState, b: StepState): boolean {
+  return a.step === b.step && a.running === b.running;
+}
+
+export function nextStoryStep(step: StoryStep): StoryStep {
+  const index = STORY_STEPS.indexOf(step);
+  return STORY_STEPS[(index + 1) % STORY_STEPS.length];
+}
 
 export function isStepRunning(state: StepState): boolean {
   return state.running;

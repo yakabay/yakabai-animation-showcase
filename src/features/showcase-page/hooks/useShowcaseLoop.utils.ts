@@ -4,8 +4,8 @@ import {
   STEP_BAY_FOCUS,
   STEP_BEATS,
   STEP_DURATION_MS,
-  makeStepState,
 } from "../showcase-page.data";
+import { makeStepState } from "../showcase-page.utils";
 import {
   CLIP_KEYS,
   type ClipKey,

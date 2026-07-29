@@ -74,7 +74,7 @@ export function ClipBay({
                 "cursor-pointer rounded-[5px] border px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out",
                 lit
                   ? "border-[#22d3ee] bg-[#101318] text-[#22d3ee]"
-                  : "border-[#2a3038] bg-[#101318] text-[#c6cdd6] hover:border-[#22d3ee] hover:text-[#22d3ee]",
+                  : "border-[#2a3038] bg-[#101318] text-[#c6cdd6] hover:border-[rgb(34_211_238/0.65)] hover:text-[rgb(34_211_238/0.65)]",
                 pressed
                   ? "scale-[0.97] translate-y-px border-[#22d3ee] bg-[#0a0e14] text-[#22d3ee] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
                   : "",

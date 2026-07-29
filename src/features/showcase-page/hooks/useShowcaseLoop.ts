@@ -22,9 +22,8 @@ import {
   BOOT_STATE,
   CYCLE_TAIL_MS,
   SCENE_TO_STEP,
-  nextStoryStep,
-  statesEqual,
 } from "../showcase-page.data";
+import { nextStoryStep, statesEqual } from "../showcase-page.utils";
 import type { ClipKey, ClipTrigger, StepState, StoryStep } from "../showcase-page.types";
 
 interface RiveRef {
@@ -263,6 +262,7 @@ export function useShowcaseLoop({
   const requestTrigger = useCallback(
     (key: ClipKey, trigger: ClipTrigger) => {
       stopAutoplay();
+      setBayFocus(bayIndexForClip(key));
 
       if (!isTriggerLegal(key, trigger, clipPhasesRef.current)) {
         return;

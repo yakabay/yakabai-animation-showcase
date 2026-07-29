@@ -7,10 +7,10 @@ interface AutoLoopButtonProps {
 const CONTROL_CLASS =
   "relative flex h-[34px] w-[108px] shrink-0 cursor-pointer items-center self-end rounded-md border p-0 font-mono text-[11px] tracking-[0.14em] uppercase";
 
-const ICON_SLOT_CLASS =
+const PAUSED_ICON_SLOT_CLASS =
   "flex h-full w-[28px] shrink-0 items-center justify-center self-stretch";
 
-const LABEL_CLASS = "relative min-w-0 flex-1 pr-1 text-center";
+const PAUSED_LABEL_CLASS = "relative min-w-0 flex-1 pr-1 text-center";
 
 export function AutoLoopButton({ paused, onPause, onResume }: AutoLoopButtonProps) {
   if (paused) {
@@ -21,12 +21,12 @@ export function AutoLoopButton({ paused, onPause, onResume }: AutoLoopButtonProp
         title="Continue the auto loop"
         className={`${CONTROL_CLASS} border-[#22d3ee] bg-[rgb(34_211_238_/_0.08)] text-[#22d3ee] transition-colors hover:bg-[rgb(34_211_238_/_0.18)]`}
       >
-        <span className={ICON_SLOT_CLASS}>
-          <span className="flex h-[18px] ml-1 w-[18px] -translate-y-0.5 items-center justify-center text-[18px] leading-none">
+        <span className={PAUSED_ICON_SLOT_CLASS}>
+          <span className="flex h-[18px] ml-1 w-[18px] translate-x-0.5 -translate-y-px items-center justify-center text-[18px] leading-none">
             ↺
           </span>
         </span>
-        <span className={`${LABEL_CLASS} mr-2`}>Resume</span>
+        <span className={`${PAUSED_LABEL_CLASS} mr-2`}>Resume</span>
       </button>
     );
   }
@@ -36,7 +36,7 @@ export function AutoLoopButton({ paused, onPause, onResume }: AutoLoopButtonProp
       type="button"
       onClick={onPause}
       title="Pause the auto loop"
-      className={`${CONTROL_CLASS} group border-[#1e2228] bg-[#0b0d10] text-[#8b929c] transition-colors hover:text-[#c6cdd6]`}
+      className={`${CONTROL_CLASS} group justify-center border-[#1e2228] bg-[#0b0d10] text-[#8b929c] transition-colors hover:text-[#c6cdd6]`}
     >
       <svg
         width="108"
@@ -59,20 +59,22 @@ export function AutoLoopButton({ paused, onPause, onResume }: AutoLoopButtonProp
           className="animate-[borderRun_2.26s_linear_infinite] motion-reduce:animate-none"
         />
       </svg>
-      <span className={ICON_SLOT_CLASS}>
+      <span className="absolute left-0 flex h-full w-[28px] items-center justify-center opacity-0 scale-50 transition-all duration-150 ease-out group-hover:opacity-100 group-hover:scale-100 motion-reduce:transition-none">
         <svg
           width="8"
           height="10"
           viewBox="0 0 10 12"
           fill="currentColor"
           aria-hidden="true"
-          className="text-[#8b929c] transition-colors duration-150 group-hover:text-[#b4bcc6]"
+          className="text-[#8b929c] transition-colors duration-150 ease-out group-hover:text-[#b4bcc6]"
         >
           <rect x="0" y="0" width="3" height="12" rx="0.5" />
           <rect x="7" y="0" width="3" height="12" rx="0.5" />
         </svg>
       </span>
-      <span className={LABEL_CLASS}>Auto loop</span>
+      <span className="relative w-full text-center transition-all duration-150 ease-out group-hover:translate-x-[12px] group-hover:pr-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:pr-0">
+        Auto loop
+      </span>
     </button>
   );
 }
