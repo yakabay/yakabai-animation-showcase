@@ -119,11 +119,11 @@ export const CLIP_BOX_CLASSNAME: Record<ClipKey, string> = {
 export const BUILD_DECISIONS: BuildDecision[] = [
   {
     title: "Motion that teaches the flow",
-    body: "The loop runs court → card → cup — predict, mint, get paid. Ten seconds, and a stranger already knows what this product does.",
+    body: "The loop shows the exact steps a user takes — predict, mint, get paid. Ten seconds, and a stranger already knows what this product does.",
   },
   {
     title: "Animation through composition",
-    body: "Reactions build on events, not keyframes. New scenes reuse existing animations, this allows complexity to scale without multiplication.",
+    body: "Every motion responds to events. New scenes reuse existing animations, this allows complexity to scale without multiplication.",
   },
   {
     title: "No race conditions by design",
