@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { MotionConfig } from "motion/react";
 
 import { BuildDecisions } from "./components/BuildDecisions";
 import { ClipBays } from "./components/ClipBays";
@@ -39,24 +40,26 @@ export function ShowcasePage() {
   });
 
   return (
-    <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
-      <HeaderBar />
-      <Hero paused={paused} onPause={pause} onResume={resume} />
-      <ClipBays
-        bayFocus={bayFocus}
-        stepState={stepState}
-        manualResetClip={manualResetClip}
-        courtRef={courtRef}
-        cardRef={cardRef}
-        cupRef={cupRef}
-        onFire={requestTrigger}
-        onClipReady={notifyClipReady}
-      />
-      <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-2">
-        <BuildDecisions />
-        <InsideTheFile />
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
+        <HeaderBar />
+        <Hero paused={paused} onPause={pause} onResume={resume} />
+        <ClipBays
+          bayFocus={bayFocus}
+          stepState={stepState}
+          manualResetClip={manualResetClip}
+          courtRef={courtRef}
+          cardRef={cardRef}
+          cupRef={cupRef}
+          onFire={requestTrigger}
+          onClipReady={notifyClipReady}
+        />
+        <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-2">
+          <BuildDecisions />
+          <InsideTheFile />
+        </div>
+        <SiteFooter />
       </div>
-      <SiteFooter />
-    </div>
+    </MotionConfig>
   );
 }

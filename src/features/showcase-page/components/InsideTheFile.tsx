@@ -1,27 +1,61 @@
-import { FILE_SPECS } from "../showcase-page.data";
+import { useState } from "react";
+import { motion } from "motion/react";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
+
+import { asset } from "../../../lib/asset";
+import { fadeUpInView, stagger } from "../showcase-page.motion";
+
+const RIVE_SCREENSHOT_SRC = asset("rive-screenshot.png");
+const RIVE_SCREENSHOT_ALT =
+  "Rive editor — cup.riv artboard, hierarchy, and state machine";
 
 export function InsideTheFile() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="px-5 py-10 sm:px-14">
-      <div className="mb-6 text-[11px] tracking-[0.18em] text-[#8b929c] uppercase">
-        Inside the file
-      </div>
+      <motion.div
+        className="mb-6 text-[11px] tracking-[0.18em] text-[#8b929c] uppercase"
+        {...fadeUpInView}
+      >
+        Inside Rive editor
+      </motion.div>
 
-      <div className="mb-6 flex h-[220px] w-full items-center justify-center rounded-lg border border-[#1e2228] text-center text-sm text-[#565d66] sm:h-[300px]">
-        Rive editor — state machine graph
-      </div>
+      <motion.button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="block w-full cursor-zoom-in overflow-hidden rounded-lg border border-[#1e2228] p-0"
+        aria-label="Open Rive editor screenshot — pinch or scroll to zoom"
+        {...fadeUpInView}
+        transition={stagger(0.08)}
+      >
+        <img
+          src={RIVE_SCREENSHOT_SRC}
+          alt={RIVE_SCREENSHOT_ALT}
+          className="block h-auto w-full"
+        />
+      </motion.button>
 
-      <div className="flex flex-col gap-[11px]">
-        {FILE_SPECS.map((row) => (
-          <div
-            key={row.label}
-            className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 text-[13px]"
-          >
-            <span className="text-[#565d66]">{row.label}</span>
-            <span className="text-right text-[#c6cdd6]">{row.value}</span>
-          </div>
-        ))}
-      </div>
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={[{ src: RIVE_SCREENSHOT_SRC, alt: RIVE_SCREENSHOT_ALT }]}
+        plugins={[Zoom]}
+        carousel={{ finite: true }}
+        controller={{ closeOnBackdropClick: true }}
+        on={{ click: () => setOpen(false) }}
+        render={{
+          buttonPrev: () => null,
+          buttonNext: () => null,
+        }}
+        zoom={{
+          maxZoomPixelRatio: 4,
+          scrollToZoom: true,
+          doubleTapDelay: 300,
+        }}
+      />
     </div>
   );
 }

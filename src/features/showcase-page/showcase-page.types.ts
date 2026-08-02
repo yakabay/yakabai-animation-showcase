@@ -35,7 +35,3 @@ export interface BuildDecision {
   body: string;
 }
 
-export interface FileSpecRow {
-  label: string;
-  value: string;
-}

@@ -1,5 +1,11 @@
 import { beatsFor } from "./hooks/useShowcaseLoop.utils";
-import { STORY_STEPS, type ClipKey, type ClipTrigger, type StepState, type StoryStep } from "./showcase-page.types";
+import {
+  STORY_STEPS,
+  type ClipKey,
+  type ClipTrigger,
+  type StepState,
+  type StoryStep,
+} from "./showcase-page.types";
 
 export function makeStepState(step: StoryStep, running: boolean): StepState {
   return { step, running };

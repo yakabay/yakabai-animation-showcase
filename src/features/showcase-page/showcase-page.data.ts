@@ -3,7 +3,6 @@ import {
   type BuildDecision,
   type ClipKey,
   type ClipTrigger,
-  type FileSpecRow,
   type StepBeat,
   type StepState,
   type StoryStep,
@@ -68,11 +67,11 @@ export const CYCLE_TAIL_MS = 400;
 export const BAY_TINT_TRANSITION_MS = 700;
 
 export const BRAND_NAME = "Yaroslav Kabai";
-export const BRAND_ROLE = "design engineer";
+export const BRAND_ROLE = "Product Engineer";
 
 export const HERO_TITLE = "Interactive onboarding your users won't skip.";
 export const HERO_SUBHEAD =
-  "Onboarding flow for an on-chain tennis prediction platform. Every scene is a live Rive state machine.";
+  "Portfolio showcase: onboarding for an on-chain tennis prediction platform.";
 
 export const BAY_COPY: Record<ClipKey, BayCopy> = {
   court: {
@@ -97,7 +96,7 @@ export const BAY_COPY: Record<ClipKey, BayCopy> = {
   },
   cup: {
     fileLabel: "cup.riv",
-    sizeLabel: "320 × 256",
+    sizeLabel: "336 × 269",
     description:
       "The reward pool is split equally between everyone who called it right.",
     triggers: [
@@ -114,35 +113,32 @@ export const CLIP_BOX_CLASSNAME: Record<ClipKey, string> = {
   court:
     "h-[180px] w-[180px] sm:h-[220px] sm:w-[220px] lg:h-[240px] lg:w-[240px]",
   card: "h-[200px] w-[200px] sm:h-[250px] sm:w-[250px] lg:h-[280px] lg:w-[280px]",
-  cup: "h-[176px] w-[220px] sm:h-[224px] sm:w-[280px] lg:h-[256px] lg:w-[320px]",
+  cup: "h-[185px] w-[231px] sm:h-[235px] sm:w-[294px] lg:h-[269px] lg:w-[336px]",
 };
 
 export const BUILD_DECISIONS: BuildDecision[] = [
   {
-    title: "Exact pixel canvases",
-    body: "Each breakpoint sets a fixed pixel box, never a CSS transform scale — the canvas resizes to match so nothing blurs from upscaling.",
+    title: "Motion that teaches the flow",
+    body: "The loop runs court → card → cup — predict, mint, get paid. Ten seconds, and a stranger already knows what this product does.",
   },
   {
-    title: "Pauses on tab blur",
-    body: "Playback resumes from the state it left, so a returning visitor never walks in mid-beat.",
+    title: "Animation through composition",
+    body: "Reactions build on events, not keyframes. New scenes reuse existing animations, this allows complexity to scale without multiplication.",
   },
   {
-    title: "One story cursor",
-    body: "A single StepState drives autoplay, Resume, Rive fires, and button highlights — manual clicks and the loop share the same path. Court and cup enforce in-clip sequences; card stays freely clickable.",
+    title: "No race conditions by design",
+    body: "One state controls the entire flow. Switch from autoplay to manual anytime. The result: interactions never collide, and the flow stays reliable under real use.",
   },
   {
-    title: "Reduced motion respected",
-    body: "The status dot stops pulsing and cycle start/tail delays collapse to zero, all keyed off one prefers-reduced-motion check.",
+    title: "No shortcuts on quality",
+    body: "Every breakpoint renders at its exact native size instead of stretching one canvas with CSS. What you get: nothing looks blurry or wrong on any device.",
   },
-];
-
-export const FILE_SPECS: FileSpecRow[] = [
-  { label: "Runtime", value: "Rive · canvas renderer" },
-  { label: "Files", value: "court.riv · card.riv · cup.riv" },
-  { label: "Triggers", value: "scene1 · scene2 · finish" },
-  { label: "Stack", value: "React · TypeScript · Tailwind CSS · Vite" },
+  {
+    title: "Stack",
+    body: "React · TypeScript · Rive · Tailwind CSS · Vite",
+  },
 ];
 
 export const FOOTER_CREDIT = "Designed, animated and built by Yaroslav Kabai.";
-export const FOOTER_EMAIL_HREF = "mailto:your@email.com";
-export const FOOTER_LINKEDIN_HREF = "https://linkedin.com/in/";
+export const FOOTER_EMAIL_HREF = "mailto:yakabay86@gmail.com";
+export const FOOTER_LINKEDIN_HREF = "https://www.linkedin.com/in/yaroslav-kabai";
