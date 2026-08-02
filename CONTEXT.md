@@ -15,7 +15,7 @@ Portfolio case study for interactive Rive onboarding clips (`court.riv`, `card.r
 | Bay tint | Soft cyan wash that crossfades across the three bays as the story advances; none during reset. |
 | Auto loop | Advances via `nextStoryStep`. Pause freezes scheduling; Resume continues from the current step. Any bay button click stops autoplay (illegal clicks stop it but do not fire). Story `reset` fires `finish` on all three clips at once. |
 | Manual reset | Bay **reset** button (`finish` trigger) resets **only that clip**. Does not run the story-wide three-clip reset. |
-| Trigger gating | Card: any mapped trigger anytime. Court: court phase (`scene1` → `finish`). Cup: cup phase (`scene1` → `scene2` → `finish`). |
+| Trigger gating | Card: any mapped trigger anytime. Court/cup: in-clip sequence, and no further clicks on that clip while its story step is running. |
 
 ## Flow
 

@@ -264,7 +264,14 @@ export function useShowcaseLoop({
       stopAutoplay();
       setBayFocus(bayIndexForClip(key));
 
-      if (!isTriggerLegal(key, trigger, clipPhasesRef.current)) {
+      if (
+        !isTriggerLegal(
+          key,
+          trigger,
+          clipPhasesRef.current,
+          stepStateRef.current
+        )
+      ) {
         return;
       }
 

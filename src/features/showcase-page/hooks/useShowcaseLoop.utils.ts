@@ -48,21 +48,32 @@ function clipHasTrigger(clip: ClipKey, trigger: ClipTrigger): boolean {
   return SCENE_TO_STEP[clip][trigger] !== undefined;
 }
 
+/** True while this clip’s beat is the currently running story step. */
+export function clipIsBusy(clip: ClipKey, state: StepState): boolean {
+  if (!state.running) return false;
+  return beatsFor(state.step).some((beat) => beat.clip === clip);
+}
+
 /**
  * Legal click is per-clip. Card: any mapped trigger anytime.
- * Court: scene1 → finish. Cup: scene1 → scene2 → finish.
+ * Court/cup: in-clip sequence, and blocked while that clip’s step is running.
  */
 export function isTriggerLegal(
   clip: ClipKey,
   trigger: ClipTrigger,
-  phases: ClipPhases
+  phases: ClipPhases,
+  state: StepState
 ): boolean {
   if (!clipHasTrigger(clip, trigger)) return false;
+  if (clip === "court" || clip === "cup") {
+    if (clipIsBusy(clip, state)) return false;
+  }
   if (clip === "court") return trigger === phases.court;
   if (clip === "cup") return trigger === phases.cup;
   return true;
 }
 
+/** Advance court sequence after a successful court (or reset) fire. */
 export function courtPhaseAfterTrigger(trigger: ClipTrigger): CourtPhase {
   if (trigger === "scene1") return "finish";
   return "scene1";
