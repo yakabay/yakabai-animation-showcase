@@ -131,7 +131,7 @@ export const BUILD_DECISIONS: BuildDecision[] = [
   },
   {
     title: "No shortcuts on quality",
-    body: "Every breakpoint renders at its exact native size instead of stretching one canvas with CSS. What you get: nothing looks blurry or wrong on any device.",
+    body: "Every breakpoint renders each Rive canvas at its exact native size instead of stretching one to fit. What you get: nothing looks blurry or wrong on any device.",
   },
   {
     title: "Stack",
