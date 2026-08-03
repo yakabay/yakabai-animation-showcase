@@ -32,8 +32,8 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
   boot: 1300,
   courtScene1: 1300,
-  cardScene1: 800,
-  cardScene2: 800,
+  cardScene1: 650,
+  cardScene2: 650,
   cupScene1: 2900,
   cupScene2: 3500,
   reset: 700,
@@ -64,7 +64,7 @@ export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
 export const CYCLE_TAIL_MS = 300;
 
 /** Pause between each story step during autoplay. */
-export const STEP_PAUSE_MS = 300;
+export const STEP_PAUSE_MS = 400;
 
 /** How long the illegal button shakes on a blocked click. */
 export const BLOCKED_SHAKE_MS = 250;
