@@ -3,6 +3,7 @@ import { MotionConfig } from "motion/react";
 
 import { BuildDecisions } from "./components/BuildDecisions";
 import { ClipBays } from "./components/ClipBays";
+import { ClipBaysStage } from "./components/ClipBaysStage";
 import type { CardClipRef } from "./components/clips/CardClip";
 import type { CourtClipRef } from "./components/clips/CourtClip";
 import type { CupClipRef } from "./components/clips/CupClip";
@@ -43,17 +44,19 @@ export function ShowcasePage() {
     <MotionConfig reducedMotion="user">
       <div className="min-h-dvh bg-[#08090b] font-mono text-[#e6e8ea]">
         <HeaderBar />
-        <Hero paused={paused} onPause={pause} onResume={resume} />
-        <ClipBays
-          bayFocus={bayFocus}
-          stepState={stepState}
-          manualResetClip={manualResetClip}
-          courtRef={courtRef}
-          cardRef={cardRef}
-          cupRef={cupRef}
-          onFire={requestTrigger}
-          onClipReady={notifyClipReady}
-        />
+        <Hero />
+        <ClipBaysStage paused={paused} onPause={pause} onResume={resume}>
+          <ClipBays
+            bayFocus={bayFocus}
+            stepState={stepState}
+            manualResetClip={manualResetClip}
+            courtRef={courtRef}
+            cardRef={cardRef}
+            cupRef={cupRef}
+            onFire={requestTrigger}
+            onClipReady={notifyClipReady}
+          />
+        </ClipBaysStage>
         <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-2">
           <BuildDecisions />
           <InsideTheFile />

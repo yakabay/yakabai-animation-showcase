@@ -32,7 +32,7 @@ function ExternalArrow() {
 
 export function SiteFooter() {
   return (
-    <footer className="z-30 flex flex-col items-center justify-between gap-3 border-t border-white/[0.07] bg-[#0b0d10] px-5 py-[18px] sm:px-7 lg:flex-row">
+    <footer className="z-30 flex flex-col items-center justify-between gap-5 border-t border-white/[0.07] bg-[#0b0d10] px-5 py-6 sm:px-7 lg:flex-row">
       <motion.span
         className="text-center text-[13px] text-[#94a3b8] lg:text-left lg:whitespace-nowrap"
         {...fadeUpInView}
