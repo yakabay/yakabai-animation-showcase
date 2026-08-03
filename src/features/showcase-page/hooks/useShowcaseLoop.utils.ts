@@ -73,6 +73,24 @@ export function isTriggerLegal(
   return true;
 }
 
+/**
+ * Which trigger is actually actionable for this clip right now: its running
+ * beat if busy, otherwise the next trigger its in-clip sequence expects.
+ */
+export function legalTriggerFor(
+  clip: ClipKey,
+  phases: ClipPhases,
+  state: StepState
+): ClipTrigger {
+  if (clipIsBusy(clip, state)) {
+    const beat = beatsFor(state.step).find((b) => b.clip === clip);
+    if (beat) return beat.trigger;
+  }
+  if (clip === "court") return phases.court;
+  if (clip === "cup") return phases.cup;
+  return "finish";
+}
+
 /** Advance court sequence after a successful court (or reset) fire. */
 export function courtPhaseAfterTrigger(trigger: ClipTrigger): CourtPhase {
   if (trigger === "scene1") return "finish";

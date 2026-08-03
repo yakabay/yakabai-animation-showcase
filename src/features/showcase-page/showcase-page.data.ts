@@ -30,11 +30,11 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
  * `boot` is the cycle-start pause; reset uses the longest finish duration.
  */
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
-  boot: 500,
+  boot: 1300,
   courtScene1: 1300,
   cardScene1: 800,
   cardScene2: 800,
-  cupScene1: 3000,
+  cupScene1: 2900,
   cupScene2: 3500,
   reset: 700,
 };
@@ -65,6 +65,12 @@ export const CYCLE_TAIL_MS = 300;
 
 /** Pause between each story step during autoplay. */
 export const STEP_PAUSE_MS = 300;
+
+/** How long the illegal button shakes on a blocked click. */
+export const BLOCKED_SHAKE_MS = 250;
+
+/** How long the actionable button pops, right after the shake finishes. */
+export const LEGAL_POP_MS = 1000;
 
 /** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
 export const BAY_TINT_TRANSITION_MS = 700;

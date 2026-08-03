@@ -48,3 +48,32 @@ body {
     stroke-dashoffset: -1;
   }
 }
+
+@keyframes triggerShake {
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes triggerPopShadow {
+  20% {
+    background-color: #171b23;
+    box-shadow: 0 0 10px rgb(34 211 238 / 0.35);
+  }
+}
+
+@keyframes triggerPopText {
+  20% {
+    transform: scale(1.12);
+    color: #22d3ee;
+  }
+}

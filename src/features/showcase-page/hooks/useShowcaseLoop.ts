@@ -12,6 +12,7 @@ import {
   cupPhaseForStep,
   durationFor,
   isTriggerLegal,
+  legalTriggerFor,
   runningState,
   settledState,
   type ClipPhases,
@@ -25,7 +26,13 @@ import {
   STEP_PAUSE_MS,
 } from "../showcase-page.data";
 import { nextStoryStep, statesEqual } from "../showcase-page.utils";
-import type { ClipKey, ClipTrigger, StepState, StoryStep } from "../showcase-page.types";
+import type {
+  BlockedAttempt,
+  ClipKey,
+  ClipTrigger,
+  StepState,
+  StoryStep,
+} from "../showcase-page.types";
 
 interface RiveRef {
   fire: (trigger: string) => void;
@@ -44,6 +51,7 @@ interface UseShowcaseLoopReturn {
   stepState: StepState;
   manualResetClip: ClipKey | null;
   activationGen: number;
+  blockedAttempt: BlockedAttempt | null;
   requestTrigger: (key: ClipKey, trigger: ClipTrigger) => void;
   notifyClipReady: (key: ClipKey) => void;
   pause: () => void;
@@ -63,6 +71,8 @@ export function useShowcaseLoop({
   const [cupPhase, setCupPhase] = useState<CupPhase>("scene1");
   const [manualResetClip, setManualResetClip] = useState<ClipKey | null>(null);
   const [activationGen, setActivationGen] = useState(0);
+  const [blockedAttempt, setBlockedAttempt] = useState<BlockedAttempt | null>(null);
+  const blockedGenRef = useRef(0);
 
   const stepStateRef = useRef(stepState);
   const clipPhasesRef = useRef<ClipPhases>({ court: "scene1", cup: "scene1" });
@@ -273,6 +283,22 @@ export function useShowcaseLoop({
           stepStateRef.current
         )
       ) {
+        const legalTrigger = legalTriggerFor(
+          key,
+          clipPhasesRef.current,
+          stepStateRef.current
+        );
+        if (legalTrigger !== trigger) {
+          setBlockedAttempt({
+            clip: key,
+            illegalTrigger: trigger,
+            legalTrigger,
+            gen: ++blockedGenRef.current,
+          });
+          if (typeof navigator !== "undefined" && navigator.vibrate) {
+            navigator.vibrate(40);
+          }
+        }
         return;
       }
 
@@ -320,6 +346,7 @@ export function useShowcaseLoop({
     stepState,
     manualResetClip,
     activationGen,
+    blockedAttempt,
     requestTrigger,
     notifyClipReady,
     pause,

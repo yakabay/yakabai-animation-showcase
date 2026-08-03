@@ -23,6 +23,14 @@ export interface StepBeat {
   trigger: ClipTrigger;
 }
 
+/** An illegal click: which button was tapped vs. which one is actually actionable. */
+export interface BlockedAttempt {
+  clip: ClipKey;
+  illegalTrigger: ClipTrigger;
+  legalTrigger: ClipTrigger;
+  gen: number;
+}
+
 export interface BayCopy {
   fileLabel: string;
   sizeLabel: string;

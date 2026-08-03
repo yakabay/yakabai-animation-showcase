@@ -26,6 +26,7 @@ export function ShowcasePage() {
     stepState,
     manualResetClip,
     activationGen,
+    blockedAttempt,
     requestTrigger,
     notifyClipReady,
     pause,
@@ -47,6 +48,7 @@ export function ShowcasePage() {
           stepState={stepState}
           manualResetClip={manualResetClip}
           activationGen={activationGen}
+          blockedAttempt={blockedAttempt}
           courtRef={courtRef}
           cardRef={cardRef}
           cupRef={cupRef}

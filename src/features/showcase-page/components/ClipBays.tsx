@@ -5,7 +5,12 @@ import {
   litTriggerForClip,
 } from "../showcase-page.utils";
 import { BAY_COPY, CLIP_BOX_CLASSNAME } from "../showcase-page.data";
-import type { ClipKey, ClipTrigger, StepState } from "../showcase-page.types";
+import type {
+  BlockedAttempt,
+  ClipKey,
+  ClipTrigger,
+  StepState,
+} from "../showcase-page.types";
 import { ClipBay } from "./ClipBay";
 import { CardClip, type CardClipRef } from "./clips/CardClip";
 import { CourtClip, type CourtClipRef } from "./clips/CourtClip";
@@ -18,6 +23,7 @@ interface ClipBaysProps {
   stepState: StepState;
   manualResetClip: ClipKey | null;
   activationGen: number;
+  blockedAttempt: BlockedAttempt | null;
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
@@ -30,6 +36,7 @@ export function ClipBays({
   stepState,
   manualResetClip,
   activationGen,
+  blockedAttempt,
   courtRef,
   cardRef,
   cupRef,
@@ -44,6 +51,7 @@ export function ClipBays({
         {...BAY_COPY.court}
         clip="court"
         activationGen={activationGen}
+        blockedAttempt={blockedAttempt}
         tint={bayTintWeight(BAY_INDEX.court, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "court", manualResetClip)}
         borderClassName={dividerClassName}
@@ -58,6 +66,7 @@ export function ClipBays({
         {...BAY_COPY.card}
         clip="card"
         activationGen={activationGen}
+        blockedAttempt={blockedAttempt}
         tint={bayTintWeight(BAY_INDEX.card, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "card", manualResetClip)}
         borderClassName={dividerClassName}
@@ -72,6 +81,7 @@ export function ClipBays({
         {...BAY_COPY.cup}
         clip="cup"
         activationGen={activationGen}
+        blockedAttempt={blockedAttempt}
         tint={bayTintWeight(BAY_INDEX.cup, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "cup", manualResetClip)}
         borderClassName=""

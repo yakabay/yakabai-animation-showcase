@@ -1,7 +1,11 @@
 import { type ReactNode, useState } from "react";
 
-import { BAY_TINT_TRANSITION_MS } from "../showcase-page.data";
-import type { ClipKey, ClipTrigger } from "../showcase-page.types";
+import {
+  BAY_TINT_TRANSITION_MS,
+  LEGAL_POP_MS,
+  BLOCKED_SHAKE_MS,
+} from "../showcase-page.data";
+import type { BlockedAttempt, ClipKey, ClipTrigger } from "../showcase-page.types";
 import { wipeDurationMs } from "../showcase-page.utils";
 import { TriggerBorderWipe } from "./TriggerBorderWipe";
 
@@ -17,6 +21,8 @@ interface ClipBayProps {
   litTrigger?: ClipTrigger;
   /** Bumped on every trigger fire; restarts the border-wipe animation. */
   activationGen: number;
+  /** Set when the user just tapped a currently-illegal trigger on any bay. */
+  blockedAttempt: BlockedAttempt | null;
   borderClassName: string;
   onFire: (trigger: ClipTrigger) => void;
   children: ReactNode;
@@ -31,6 +37,7 @@ export function ClipBay({
   tint,
   litTrigger,
   activationGen,
+  blockedAttempt,
   borderClassName,
   onFire,
   children,
@@ -64,9 +71,15 @@ export function ClipBay({
         {triggers.map(({ label, trigger }) => {
           const lit = litTrigger === trigger;
           const pressed = pressing === trigger;
+
+          const isBlockedTarget = blockedAttempt?.clip === clip;
+          const shaking = isBlockedTarget && blockedAttempt.illegalTrigger === trigger;
+          const popping = isBlockedTarget && blockedAttempt.legalTrigger === trigger;
+          const blockedGen = blockedAttempt?.gen;
+
           return (
             <button
-              key={label}
+              key={shaking || popping ? `${label}-${blockedGen}` : label}
               type="button"
               onPointerDown={() => {
                 setPressing(trigger);
@@ -77,6 +90,15 @@ export function ClipBay({
               onClick={() => {
                 onFire(trigger);
               }}
+              style={
+                shaking
+                  ? { animation: `triggerShake ${BLOCKED_SHAKE_MS}ms ease-out` }
+                  : popping
+                    ? {
+                        animation: `triggerPopShadow ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
+                      }
+                    : undefined
+              }
               className={[
                 "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
                 lit ? "text-[#22d3ee]" : "text-[#c6cdd6] hover:bg-[#171b23]",
@@ -91,7 +113,18 @@ export function ClipBay({
                   durationMs={wipeDurationMs(clip, trigger)}
                 />
               )}
-              <span className="relative">{label}</span>
+              <span
+                className="relative"
+                style={
+                  popping
+                    ? {
+                        animation: `triggerPopText ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
+                      }
+                    : undefined
+                }
+              >
+                {label}
+              </span>
             </button>
           );
         })}
