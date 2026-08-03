@@ -147,7 +147,7 @@ export const FOOTER_STACK = [
   "Vite",
 ] as const;
 
-export const FOOTER_CREDIT_PREFIX = "Designed, animated and built by";
+export const FOOTER_CREDIT_PREFIX = "Designed and built by";
 export const FOOTER_CREDIT_NAME = "Yaroslav Kabai";
 export const FOOTER_EMAIL_HREF = "mailto:yakabay86@gmail.com";
 export const FOOTER_LINKEDIN_HREF = "https://www.linkedin.com/in/yaroslav-kabai";

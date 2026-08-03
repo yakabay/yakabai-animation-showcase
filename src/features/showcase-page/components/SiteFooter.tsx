@@ -32,9 +32,9 @@ function ExternalArrow() {
 
 export function SiteFooter() {
   return (
-    <footer className="z-30 flex flex-col items-center justify-between gap-2 border-t border-white/[0.07] bg-[#0b0d10] px-5 py-3.5 sm:flex-row sm:gap-4 sm:px-7 sm:py-3.5 md:gap-6">
+    <footer className="z-30 flex flex-col items-center justify-between gap-3 border-t border-white/[0.07] bg-[#0b0d10] px-5 py-[18px] sm:px-7 lg:flex-row">
       <motion.span
-        className="text-center text-[13px] text-[#94a3b8] sm:text-left sm:whitespace-nowrap"
+        className="text-center text-[13px] text-[#94a3b8] lg:text-left lg:whitespace-nowrap"
         {...fadeUpInView}
       >
         {FOOTER_CREDIT_PREFIX}{" "}
@@ -42,7 +42,7 @@ export function SiteFooter() {
       </motion.span>
 
       <motion.span
-        className="text-center font-mono text-[10px] tracking-[0.06em] whitespace-normal text-[#475569] sm:text-[11px] sm:whitespace-nowrap"
+        className="text-center font-mono text-[10px] tracking-[0.06em] text-[#475569] sm:text-[11px] lg:whitespace-nowrap"
         {...fadeUpInView}
         transition={stagger(0.06)}
       >
