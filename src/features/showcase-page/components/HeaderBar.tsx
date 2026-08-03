@@ -6,7 +6,7 @@ export function HeaderBar() {
     <header className="z-30 flex items-center justify-between gap-4 border-b border-white/[0.07] bg-[#0b0d10] px-5 py-3.5 sm:px-8 sm:py-6">
       <div className="flex items-center gap-2.5 sm:gap-3">
         <BrandMark className="block size-[30px] shrink-0 sm:size-[34px]" />
-        <div className="flex min-w-0 items-baseline gap-2">
+        <div className="flex min-w-0 items-baseline gap-3">
           <span className="whitespace-nowrap text-base font-semibold tracking-[-0.01em] text-white">
             {BRAND_NAME}
           </span>

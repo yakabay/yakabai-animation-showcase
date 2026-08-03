@@ -65,7 +65,7 @@ export function SiteFooter() {
         </a>
         <a
           href={FOOTER_EMAIL_HREF}
-          className="whitespace-nowrap rounded-[5px] bg-[#22d3ee] px-6 py-3 text-[13px] font-bold tracking-[-0.005em] text-[#08090b] transition-colors hover:bg-[#67e8f9] sm:px-5 sm:py-2.5"
+          className="whitespace-nowrap rounded-[5px] bg-[#22d3ee] px-3.5 py-2 text-[13px] font-bold tracking-[-0.005em] text-[#08090b] transition-colors hover:bg-[#67e8f9] sm:px-5 sm:py-2.5"
         >
           Get in touch
         </a>
