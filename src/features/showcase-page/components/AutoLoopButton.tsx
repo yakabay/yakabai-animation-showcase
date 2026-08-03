@@ -29,7 +29,7 @@ export function AutoLoopButton({
         type="button"
         onClick={onResume}
         title="Continue the auto loop"
-        className={`${CONTROL_CLASS} border-[#22d3ee] bg-[rgb(34_211_238_/_0.08)] text-[#22d3ee] hover:bg-[rgb(34_211_238_/_0.18)] ${elevated ? ELEVATED_SHADOW : "shadow-none"}`}
+        className={`${CONTROL_CLASS} border-[#22d3ee] bg-[#0b0d10] text-[#22d3ee] hover:bg-[#101820] ${elevated ? ELEVATED_SHADOW : "shadow-none"}`}
       >
         <span className={PAUSED_ICON_SLOT_CLASS}>
           <span className="flex h-[18px] ml-1 w-[18px] translate-x-0.5 -translate-y-px items-center justify-center text-[18px] leading-none">
