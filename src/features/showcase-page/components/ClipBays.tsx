@@ -17,6 +17,7 @@ interface ClipBaysProps {
   bayFocus: number;
   stepState: StepState;
   manualResetClip: ClipKey | null;
+  activationGen: number;
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
@@ -28,6 +29,7 @@ export function ClipBays({
   bayFocus,
   stepState,
   manualResetClip,
+  activationGen,
   courtRef,
   cardRef,
   cupRef,
@@ -40,6 +42,8 @@ export function ClipBays({
     <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-3">
       <ClipBay
         {...BAY_COPY.court}
+        clip="court"
+        activationGen={activationGen}
         tint={bayTintWeight(BAY_INDEX.court, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "court", manualResetClip)}
         borderClassName={dividerClassName}
@@ -52,6 +56,8 @@ export function ClipBays({
 
       <ClipBay
         {...BAY_COPY.card}
+        clip="card"
+        activationGen={activationGen}
         tint={bayTintWeight(BAY_INDEX.card, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "card", manualResetClip)}
         borderClassName={dividerClassName}
@@ -64,6 +70,8 @@ export function ClipBays({
 
       <ClipBay
         {...BAY_COPY.cup}
+        clip="cup"
+        activationGen={activationGen}
         tint={bayTintWeight(BAY_INDEX.cup, bayFocus)}
         litTrigger={litTriggerForClip(stepState, "cup", manualResetClip)}
         borderClassName=""

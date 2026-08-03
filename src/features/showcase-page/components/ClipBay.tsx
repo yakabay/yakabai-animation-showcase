@@ -1,9 +1,12 @@
 import { type ReactNode, useState } from "react";
 
 import { BAY_TINT_TRANSITION_MS } from "../showcase-page.data";
-import type { ClipTrigger } from "../showcase-page.types";
+import type { ClipKey, ClipTrigger } from "../showcase-page.types";
+import { wipeDurationMs } from "../showcase-page.utils";
+import { TriggerBorderWipe } from "./TriggerBorderWipe";
 
 interface ClipBayProps {
+  clip: ClipKey;
   fileLabel: string;
   sizeLabel: string;
   description: string;
@@ -12,18 +15,22 @@ interface ClipBayProps {
   tint: number;
   /** Derived from clip *Playing state. */
   litTrigger?: ClipTrigger;
+  /** Bumped on every trigger fire; restarts the border-wipe animation. */
+  activationGen: number;
   borderClassName: string;
   onFire: (trigger: ClipTrigger) => void;
   children: ReactNode;
 }
 
 export function ClipBay({
+  clip,
   fileLabel,
   sizeLabel,
   description,
   triggers,
   tint,
   litTrigger,
+  activationGen,
   borderClassName,
   onFire,
   children,
@@ -71,16 +78,20 @@ export function ClipBay({
                 onFire(trigger);
               }}
               className={[
-                "cursor-pointer rounded-[5px] border px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
-                lit
-                  ? "border-[#22d3ee] bg-[#101318] text-[#22d3ee]"
-                  : "border-[#2a3038] bg-[#101318] text-[#c6cdd6] hover:bg-[#171b23]",
+                "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
+                lit ? "text-[#22d3ee]" : "text-[#c6cdd6] hover:bg-[#171b23]",
                 pressed
                   ? "scale-[0.97] translate-y-px bg-[#0d1016] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
                   : "",
               ].join(" ")}
             >
-              {label}
+              {lit && (
+                <TriggerBorderWipe
+                  activationGen={activationGen}
+                  durationMs={wipeDurationMs(clip, trigger)}
+                />
+              )}
+              <span className="relative">{label}</span>
             </button>
           );
         })}

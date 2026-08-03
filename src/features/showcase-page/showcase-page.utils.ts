@@ -1,4 +1,5 @@
 import { beatsFor } from "./hooks/useShowcaseLoop.utils";
+import { SCENE_TO_STEP, STEP_DURATION_MS } from "./showcase-page.data";
 import {
   STORY_STEPS,
   type ClipKey,
@@ -39,6 +40,13 @@ export function litTriggerForClip(
   if (!isStepRunning(state)) return undefined;
   const beat = beatsFor(state.step).find((b) => b.clip === clip);
   return beat?.trigger;
+}
+
+/** Border-wipe duration for a bay trigger button — same clock as its actual play time. */
+export function wipeDurationMs(clip: ClipKey, trigger: ClipTrigger): number {
+  if (trigger === "finish") return STEP_DURATION_MS.reset;
+  const step = SCENE_TO_STEP[clip][trigger];
+  return step ? STEP_DURATION_MS[step] : STEP_DURATION_MS.reset;
 }
 
 /** Soft weight for bay tint: 1 at focus, falls off across neighbors. */

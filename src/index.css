@@ -39,3 +39,12 @@ body {
     stroke-dashoffset: -270;
   }
 }
+
+@keyframes borderWipe {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}

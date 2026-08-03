@@ -66,10 +66,10 @@ export function AutoLoopButton({
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeDasharray="80 190"
-          className="animate-[borderRun_2.26s_linear_infinite] motion-reduce:animate-none"
+          className="animate-[borderRun_2.26s_linear_infinite]"
         />
       </svg>
-      <span className="absolute left-0 flex h-full w-[28px] items-center justify-center opacity-0 scale-50 transition-all duration-150 ease-out group-hover:opacity-100 group-hover:scale-100 motion-reduce:transition-none">
+      <span className="absolute left-0 flex h-full w-[28px] items-center justify-center opacity-0 scale-50 transition-all duration-150 ease-out group-hover:opacity-100 group-hover:scale-100">
         <svg
           width="8"
           height="10"
@@ -82,7 +82,7 @@ export function AutoLoopButton({
           <rect x="7" y="0" width="3" height="12" rx="0.5" />
         </svg>
       </span>
-      <span className="relative w-full text-center transition-all duration-150 ease-out group-hover:translate-x-[12px] group-hover:pr-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:pr-0">
+      <span className="relative w-full text-center transition-all duration-150 ease-out group-hover:translate-x-[12px] group-hover:pr-1">
         Auto loop
       </span>
     </button>

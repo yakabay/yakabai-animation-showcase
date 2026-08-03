@@ -31,11 +31,11 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
  */
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
   boot: 500,
-  courtScene1: 2100,
-  cardScene1: 1500,
+  courtScene1: 1500,
+  cardScene1: 1000,
   cardScene2: 900,
-  cupScene1: 3300,
-  cupScene2: 4300,
+  cupScene1: 3200,
+  cupScene2: 4100,
   reset: 700,
 };
 
@@ -150,4 +150,5 @@ export const FOOTER_STACK = [
 export const FOOTER_CREDIT_PREFIX = "Designed and built by";
 export const FOOTER_CREDIT_NAME = "Yaroslav Kabai";
 export const FOOTER_EMAIL_HREF = "mailto:yakabay86@gmail.com";
-export const FOOTER_LINKEDIN_HREF = "https://www.linkedin.com/in/yaroslav-kabai";
+export const FOOTER_LINKEDIN_HREF =
+  "https://www.linkedin.com/in/yaroslav-kabai";

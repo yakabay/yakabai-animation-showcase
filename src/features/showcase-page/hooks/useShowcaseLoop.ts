@@ -35,7 +35,6 @@ interface UseShowcaseLoopProps {
   cardRef: RefObject<RiveRef | null>;
   cupRef: RefObject<RiveRef | null>;
   enabled: boolean;
-  reducedMotion: boolean;
 }
 
 interface UseShowcaseLoopReturn {
@@ -43,6 +42,7 @@ interface UseShowcaseLoopReturn {
   bayFocus: number;
   stepState: StepState;
   manualResetClip: ClipKey | null;
+  activationGen: number;
   requestTrigger: (key: ClipKey, trigger: ClipTrigger) => void;
   notifyClipReady: (key: ClipKey) => void;
   pause: () => void;
@@ -54,7 +54,6 @@ export function useShowcaseLoop({
   cardRef,
   cupRef,
   enabled,
-  reducedMotion,
 }: UseShowcaseLoopProps): UseShowcaseLoopReturn {
   const [stepState, setStepState] = useState<StepState>(BOOT_STATE);
   const [paused, setPaused] = useState(false);
@@ -62,13 +61,13 @@ export function useShowcaseLoop({
   const [courtPhase, setCourtPhase] = useState<CourtPhase>("scene1");
   const [cupPhase, setCupPhase] = useState<CupPhase>("scene1");
   const [manualResetClip, setManualResetClip] = useState<ClipKey | null>(null);
+  const [activationGen, setActivationGen] = useState(0);
 
   const stepStateRef = useRef(stepState);
   const clipPhasesRef = useRef<ClipPhases>({ court: "scene1", cup: "scene1" });
   const manualResetClipRef = useRef<ClipKey | null>(null);
   const clipsReadyRef = useRef(createInitialClipReady());
   const pausedRef = useRef(false);
-  const reducedMotionRef = useRef(reducedMotion);
   const enabledRef = useRef(enabled);
   const mountedRef = useRef(true);
   const storyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,7 +75,6 @@ export function useShowcaseLoop({
   const refsRef = useRef({ court: courtRef, card: cardRef, cup: cupRef });
 
   refsRef.current = { court: courtRef, card: cardRef, cup: cupRef };
-  reducedMotionRef.current = reducedMotion;
   enabledRef.current = enabled;
   stepStateRef.current = stepState;
   clipPhasesRef.current = { court: courtPhase, cup: cupPhase };
@@ -129,9 +127,10 @@ export function useShowcaseLoop({
 
   const enterStep = useCallback(
     (step: StoryStep) => {
-      const duration = reducedMotionRef.current ? 0 : durationFor(step);
+      const duration = durationFor(step);
       clearStoryTimer();
       clearManualReset();
+      setActivationGen((gen) => gen + 1);
 
       const running = runningState(step);
       setStep(running);
@@ -159,8 +158,9 @@ export function useShowcaseLoop({
   /** Manual reset: finish only this clip. Autoplay `reset` still hits all three. */
   const enterClipReset = useCallback(
     (clip: ClipKey) => {
-      const duration = reducedMotionRef.current ? 0 : durationFor("reset");
+      const duration = durationFor("reset");
       clearStoryTimer();
+      setActivationGen((gen) => gen + 1);
 
       const current = stepStateRef.current;
       if (current.running) {
@@ -221,7 +221,7 @@ export function useShowcaseLoop({
     }
 
     if (state.step === "reset") {
-      delay(reducedMotionRef.current ? 0 : CYCLE_TAIL_MS, () => {
+      delay(CYCLE_TAIL_MS, () => {
         if (!stillAuto()) return;
         if (stepStateRef.current.step !== "reset" || stepStateRef.current.running) {
           return;
@@ -318,6 +318,7 @@ export function useShowcaseLoop({
     bayFocus,
     stepState,
     manualResetClip,
+    activationGen,
     requestTrigger,
     notifyClipReady,
     pause,
