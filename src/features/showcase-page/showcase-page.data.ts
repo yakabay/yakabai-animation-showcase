@@ -134,11 +134,20 @@ export const BUILD_DECISIONS: BuildDecision[] = [
     body: "Every breakpoint renders each Rive canvas at its exact native size instead of stretching one to fit. What you get: nothing looks blurry or wrong on any device.",
   },
   {
-    title: "Stack",
-    body: "React · TypeScript · Rive · Tailwind CSS · Vite",
+    title: "Working with AI, deliberately",
+    body: "Domain and architecture docs gave the AI agent the same context a human engineer would need. Real leverage, not hype.",
   },
 ];
 
-export const FOOTER_CREDIT = "Designed, animated and built by Yaroslav Kabai.";
+export const FOOTER_STACK = [
+  "React",
+  "TypeScript",
+  "Rive",
+  "Tailwind CSS",
+  "Vite",
+] as const;
+
+export const FOOTER_CREDIT_PREFIX = "Designed, animated and built by";
+export const FOOTER_CREDIT_NAME = "Yaroslav Kabai";
 export const FOOTER_EMAIL_HREF = "mailto:yakabay86@gmail.com";
 export const FOOTER_LINKEDIN_HREF = "https://www.linkedin.com/in/yaroslav-kabai";

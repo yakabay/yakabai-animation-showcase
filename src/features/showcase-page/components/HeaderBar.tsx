@@ -1,14 +1,20 @@
 import { BRAND_NAME, BRAND_ROLE } from "../showcase-page.data";
+import { BrandMark } from "./BrandMark";
 
 export function HeaderBar() {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-[#1e2228] bg-[#0b0d10] px-5 py-4 sm:px-14 sm:py-[18px]">
-      <div className="flex items-center gap-3">
-        <span className="h-[7px] w-[7px] shrink-0 animate-[pulseDot_2s_ease-in-out_infinite] rounded-full bg-[#22d3ee] motion-reduce:animate-none" />
-        <span className="text-[11px] tracking-[0.16em] text-[#9aa2ad] uppercase sm:text-xs">
-          {BRAND_NAME} / {BRAND_ROLE}
-        </span>
+    <header className="z-30 flex items-center justify-between gap-4 border-b border-white/[0.07] bg-[#0b0d10] px-5 py-3.5 sm:px-8 sm:py-6">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <BrandMark className="block size-[30px] shrink-0 sm:size-[34px]" />
+        <div className="flex flex-col items-baseline gap-0.5 sm:flex-row sm:gap-2">
+          <span className="whitespace-nowrap text-base font-semibold tracking-[-0.01em] text-white">
+            {BRAND_NAME}
+          </span>
+          <span className="text-xs leading-snug text-[#94a3b8] sm:text-[13px]">
+            {BRAND_ROLE}
+          </span>
+        </div>
       </div>
-    </div>
+    </header>
   );
 }

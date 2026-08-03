@@ -1,37 +1,75 @@
 import { motion } from "motion/react";
 
-import { FOOTER_CREDIT, FOOTER_EMAIL_HREF, FOOTER_LINKEDIN_HREF } from "../showcase-page.data";
+import {
+  FOOTER_CREDIT_NAME,
+  FOOTER_CREDIT_PREFIX,
+  FOOTER_EMAIL_HREF,
+  FOOTER_LINKEDIN_HREF,
+  FOOTER_STACK,
+} from "../showcase-page.data";
 import { fadeUpInView, stagger } from "../showcase-page.motion";
+
+function ExternalArrow() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+      className="block"
+    >
+      <path
+        d="M3.2 8.8 8.8 3.2M4.4 3.2h4.4v4.4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export function SiteFooter() {
   return (
-    <div className="flex flex-col items-center gap-6 border-t border-[#1e2228] bg-[#0b0d10] px-5 py-8 sm:flex-row sm:justify-between sm:gap-8 sm:px-14">
+    <footer className="z-30 flex flex-col items-center justify-between gap-2 border-t border-white/[0.07] bg-[#0b0d10] px-5 py-3.5 sm:flex-row sm:gap-4 sm:px-7 sm:py-3.5 md:gap-6">
       <motion.span
-        className="font-sans text-sm text-[#c6cdd6] sm:text-base"
+        className="text-center text-[13px] text-[#94a3b8] sm:text-left sm:whitespace-nowrap"
         {...fadeUpInView}
       >
-        {FOOTER_CREDIT}
+        {FOOTER_CREDIT_PREFIX}{" "}
+        <span className="font-medium text-[#e2e8f0]">{FOOTER_CREDIT_NAME}</span>
       </motion.span>
-      <motion.div
-        className="flex gap-2.5"
+
+      <motion.span
+        className="text-center font-mono text-[10px] tracking-[0.06em] whitespace-normal text-[#475569] sm:text-[11px] sm:whitespace-nowrap"
         {...fadeUpInView}
-        transition={stagger(0.08)}
+        transition={stagger(0.06)}
       >
-        <a
-          href={FOOTER_EMAIL_HREF}
-          className="rounded-[5px] border border-[#2a3038] px-[18px] py-2.5 text-xs tracking-[0.12em] text-[#c6cdd6]"
-        >
-          EMAIL →
-        </a>
+        {FOOTER_STACK.join(" · ")}
+      </motion.span>
+
+      <motion.div
+        className="flex items-center gap-[18px]"
+        {...fadeUpInView}
+        transition={stagger(0.12)}
+      >
         <a
           href={FOOTER_LINKEDIN_HREF}
           target="_blank"
           rel="noreferrer"
-          className="rounded-[5px] border border-[#22d3ee] px-[18px] py-2.5 text-xs tracking-[0.12em] text-[#22d3ee]"
+          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#22d3ee] transition-colors hover:text-[#67e8f9]"
         >
-          LINKEDIN →
+          LinkedIn
+          <ExternalArrow />
+        </a>
+        <a
+          href={FOOTER_EMAIL_HREF}
+          className="whitespace-nowrap rounded-[5px] bg-[#22d3ee] px-6 py-3 text-[13px] font-bold tracking-[-0.005em] text-[#08090b] transition-colors hover:bg-[#67e8f9] sm:px-5 sm:py-2.5"
+        >
+          Get in touch
         </a>
       </motion.div>
-    </div>
+    </footer>
   );
 }
