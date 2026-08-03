@@ -31,7 +31,7 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
  */
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
   boot: 1300,
-  courtScene1: 1300,
+  courtScene1: 1200,
   cardScene1: 650,
   cardScene2: 650,
   cupScene1: 2900,
