@@ -31,11 +31,11 @@ export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
  */
 export const STEP_DURATION_MS: Record<StoryStep, number> = {
   boot: 500,
-  courtScene1: 1500,
-  cardScene1: 1000,
-  cardScene2: 900,
-  cupScene1: 3200,
-  cupScene2: 4100,
+  courtScene1: 1300,
+  cardScene1: 800,
+  cardScene2: 800,
+  cupScene1: 3000,
+  cupScene2: 3500,
   reset: 700,
 };
 
@@ -61,7 +61,10 @@ export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
 };
 
 /** Hold on reset settled before the next cycle's `boot` step. */
-export const CYCLE_TAIL_MS = 400;
+export const CYCLE_TAIL_MS = 300;
+
+/** Pause between each story step during autoplay. */
+export const STEP_PAUSE_MS = 300;
 
 /** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
 export const BAY_TINT_TRANSITION_MS = 700;

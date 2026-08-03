@@ -22,6 +22,7 @@ import {
   BOOT_STATE,
   CYCLE_TAIL_MS,
   SCENE_TO_STEP,
+  STEP_PAUSE_MS,
 } from "../showcase-page.data";
 import { nextStoryStep, statesEqual } from "../showcase-page.utils";
 import type { ClipKey, ClipTrigger, StepState, StoryStep } from "../showcase-page.types";
@@ -231,7 +232,7 @@ export function useShowcaseLoop({
       return;
     }
 
-    delay(0, () => {
+    delay(STEP_PAUSE_MS, () => {
       if (!stillAuto()) return;
       const current = stepStateRef.current;
       if (current.running || current.step !== state.step) return;
