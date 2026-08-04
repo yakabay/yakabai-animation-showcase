@@ -2,10 +2,14 @@ import { type ReactNode, useState } from "react";
 
 import {
   BAY_TINT_TRANSITION_MS,
-  LEGAL_POP_MS,
   BLOCKED_SHAKE_MS,
+  LEGAL_POP_MS,
 } from "../showcase-page.data";
-import type { BlockedAttempt, ClipKey, ClipTrigger } from "../showcase-page.types";
+import type {
+  BlockedAttempt,
+  ClipKey,
+  ClipTrigger,
+} from "../showcase-page.types";
 import { wipeDurationMs } from "../showcase-page.utils";
 import { TriggerBorderWipe } from "./TriggerBorderWipe";
 
@@ -55,8 +59,12 @@ export function ClipBay({
       }}
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs tracking-[0.16em] text-[#9aa2ad] uppercase">{fileLabel}</span>
-        <span className="text-[11px] tracking-[0.1em] text-[#565d66]">{sizeLabel}</span>
+        <span className="text-xs tracking-[0.16em] text-[#9aa2ad] uppercase">
+          {fileLabel}
+        </span>
+        <span className="text-[11px] tracking-[0.1em] text-[#565d66]">
+          {sizeLabel}
+        </span>
       </div>
 
       <div className="flex h-[180px] items-center justify-center sm:h-[220px] lg:h-[270px]">
@@ -73,13 +81,15 @@ export function ClipBay({
           const pressed = pressing === trigger;
 
           const isBlockedTarget = blockedAttempt?.clip === clip;
-          const shaking = isBlockedTarget && blockedAttempt.illegalTrigger === trigger;
-          const popping = isBlockedTarget && blockedAttempt.legalTrigger === trigger;
+          const shaking =
+            isBlockedTarget && blockedAttempt.illegalTrigger === trigger;
+          const popping =
+            isBlockedTarget && blockedAttempt.legalTrigger === trigger;
           const blockedGen = blockedAttempt?.gen;
 
           return (
             <button
-              key={shaking || popping ? `${label}-${blockedGen}` : label}
+              key={shaking ? `${label}-${blockedGen}` : label}
               type="button"
               onPointerDown={() => {
                 setPressing(trigger);
@@ -93,11 +103,7 @@ export function ClipBay({
               style={
                 shaking
                   ? { animation: `triggerShake ${BLOCKED_SHAKE_MS}ms ease-out` }
-                  : popping
-                    ? {
-                        animation: `triggerPopShadow ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
-                      }
-                    : undefined
+                  : undefined
               }
               className={[
                 "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
@@ -113,7 +119,18 @@ export function ClipBay({
                   durationMs={wipeDurationMs(clip, trigger)}
                 />
               )}
+              {popping && (
+                <span
+                  key={`shadow-${blockedGen}`}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[5px]"
+                  style={{
+                    animation: `triggerPopShadow ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
+                  }}
+                />
+              )}
               <span
+                key={popping ? `text-${blockedGen}` : undefined}
                 className="relative"
                 style={
                   popping
