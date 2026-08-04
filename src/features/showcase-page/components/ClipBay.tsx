@@ -1,17 +1,12 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 
-import {
-  BAY_TINT_TRANSITION_MS,
-  BLOCKED_SHAKE_MS,
-  LEGAL_POP_MS,
-} from "../showcase-page.data";
+import { BAY_TINT_TRANSITION_MS } from "../showcase-page.data";
 import type {
   BlockedAttempt,
   ClipKey,
   ClipTrigger,
 } from "../showcase-page.types";
-import { wipeDurationMs } from "../showcase-page.utils";
-import { TriggerBorderWipe } from "./TriggerBorderWipe";
+import { TriggerButton } from "./TriggerButton";
 
 interface ClipBayProps {
   clip: ClipKey;
@@ -46,10 +41,6 @@ export function ClipBay({
   onFire,
   children,
 }: ClipBayProps) {
-  const [pressing, setPressing] = useState<ClipTrigger | null>(null);
-
-  const clearPress = () => setPressing(null);
-
   return (
     <div
       className={`flex min-w-0 flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 ${borderClassName}`}
@@ -77,72 +68,20 @@ export function ClipBay({
 
       <div className="flex flex-wrap gap-2">
         {triggers.map(({ label, trigger }) => {
-          const lit = litTrigger === trigger;
-          const pressed = pressing === trigger;
-
           const isBlockedTarget = blockedAttempt?.clip === clip;
-          const shaking =
-            isBlockedTarget && blockedAttempt.illegalTrigger === trigger;
-          const popping =
-            isBlockedTarget && blockedAttempt.legalTrigger === trigger;
-          const blockedGen = blockedAttempt?.gen;
-
           return (
-            <button
-              key={shaking ? `${label}-${blockedGen}` : label}
-              type="button"
-              onPointerDown={() => {
-                setPressing(trigger);
-              }}
-              onPointerUp={clearPress}
-              onPointerLeave={clearPress}
-              onPointerCancel={clearPress}
-              onClick={() => {
-                onFire(trigger);
-              }}
-              style={
-                shaking
-                  ? { animation: `triggerShake ${BLOCKED_SHAKE_MS}ms ease-out` }
-                  : undefined
-              }
-              className={[
-                "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
-                lit ? "text-[#22d3ee]" : "text-[#c6cdd6] hover:bg-[#171b23]",
-                pressed
-                  ? "scale-[0.97] translate-y-px bg-[#0d1016] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
-                  : "",
-              ].join(" ")}
-            >
-              {lit && (
-                <TriggerBorderWipe
-                  activationGen={activationGen}
-                  durationMs={wipeDurationMs(clip, trigger)}
-                />
-              )}
-              {popping && (
-                <span
-                  key={`shadow-${blockedGen}`}
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-[5px]"
-                  style={{
-                    animation: `triggerPopShadow ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
-                  }}
-                />
-              )}
-              <span
-                key={popping ? `text-${blockedGen}` : undefined}
-                className="relative"
-                style={
-                  popping
-                    ? {
-                        animation: `triggerPopText ${LEGAL_POP_MS}ms ease-out ${BLOCKED_SHAKE_MS}ms`,
-                      }
-                    : undefined
-                }
-              >
-                {label}
-              </span>
-            </button>
+            <TriggerButton
+              key={label}
+              clip={clip}
+              trigger={trigger}
+              label={label}
+              lit={litTrigger === trigger}
+              activationGen={activationGen}
+              shaking={isBlockedTarget && blockedAttempt.illegalTrigger === trigger}
+              popping={isBlockedTarget && blockedAttempt.legalTrigger === trigger}
+              blockedGen={blockedAttempt?.gen}
+              onFire={onFire}
+            />
           );
         })}
       </div>
