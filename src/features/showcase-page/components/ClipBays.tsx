@@ -1,94 +1,46 @@
 import type { RefObject } from "react";
 
-import {
-  bayTintWeight,
-  litTriggerForClip,
-} from "../showcase-page.utils";
 import { BAY_COPY, CLIP_BOX_CLASSNAME } from "../showcase-page.data";
-import type {
-  BlockedAttempt,
-  ClipKey,
-  ClipTrigger,
-  StepState,
-} from "../showcase-page.types";
+import { useShowcaseStore } from "../store/showcase-store";
 import { ClipBay } from "./ClipBay";
 import { CardClip, type CardClipRef } from "./clips/CardClip";
 import { CourtClip, type CourtClipRef } from "./clips/CourtClip";
 import { CupClip, type CupClipRef } from "./clips/CupClip";
 
-const BAY_INDEX = { court: 0, card: 1, cup: 2 } as const;
-
 interface ClipBaysProps {
-  bayFocus: number;
-  stepState: StepState;
-  manualResetClip: ClipKey | null;
-  activationGen: number;
-  blockedAttempt: BlockedAttempt | null;
   courtRef: RefObject<CourtClipRef | null>;
   cardRef: RefObject<CardClipRef | null>;
   cupRef: RefObject<CupClipRef | null>;
-  onFire: (key: ClipKey, trigger: ClipTrigger) => void;
-  onClipReady: (key: ClipKey) => void;
 }
 
-export function ClipBays({
-  bayFocus,
-  stepState,
-  manualResetClip,
-  activationGen,
-  blockedAttempt,
-  courtRef,
-  cardRef,
-  cupRef,
-  onFire,
-  onClipReady,
-}: ClipBaysProps) {
-  const dividerClassName = "border-b border-[#1e2228] sm:border-r sm:border-b-0";
+const DIVIDER = "border-b border-[#1e2228] sm:border-r sm:border-b-0";
+
+/**
+ * Each bay subscribes to its own clip, so the props here are only the Rive
+ * refs and the static copy — nothing that changes as the loop runs.
+ */
+export function ClipBays({ courtRef, cardRef, cupRef }: ClipBaysProps) {
+  // Autoplay holds until all three report in, and a click on an unloaded clip
+  // is rejected rather than silently swallowed.
+  const notifyReady = useShowcaseStore((store) => store.notifyReady);
 
   return (
     <div className="grid grid-cols-1 border-t border-[#1e2228] sm:grid-cols-3">
-      <ClipBay
-        {...BAY_COPY.court}
-        clip="court"
-        activationGen={activationGen}
-        blockedAttempt={blockedAttempt}
-        tint={bayTintWeight(BAY_INDEX.court, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "court", manualResetClip)}
-        borderClassName={dividerClassName}
-        onFire={(trigger) => onFire("court", trigger)}
-      >
+      <ClipBay {...BAY_COPY.court} clip="court" borderClassName={DIVIDER}>
         <div className={CLIP_BOX_CLASSNAME.court}>
-          <CourtClip ref={courtRef} onReady={() => onClipReady("court")} />
+          <CourtClip ref={courtRef} onReady={() => notifyReady("court")} />
         </div>
       </ClipBay>
 
-      <ClipBay
-        {...BAY_COPY.card}
-        clip="card"
-        activationGen={activationGen}
-        blockedAttempt={blockedAttempt}
-        tint={bayTintWeight(BAY_INDEX.card, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "card", manualResetClip)}
-        borderClassName={dividerClassName}
-        onFire={(trigger) => onFire("card", trigger)}
-      >
+      <ClipBay {...BAY_COPY.card} clip="card" borderClassName={DIVIDER}>
         <div className={CLIP_BOX_CLASSNAME.card}>
-          <CardClip ref={cardRef} onReady={() => onClipReady("card")} />
+          <CardClip ref={cardRef} onReady={() => notifyReady("card")} />
         </div>
       </ClipBay>
 
-      <ClipBay
-        {...BAY_COPY.cup}
-        clip="cup"
-        activationGen={activationGen}
-        blockedAttempt={blockedAttempt}
-        tint={bayTintWeight(BAY_INDEX.cup, bayFocus)}
-        litTrigger={litTriggerForClip(stepState, "cup", manualResetClip)}
-        borderClassName=""
-        onFire={(trigger) => onFire("cup", trigger)}
-      >
+      <ClipBay {...BAY_COPY.cup} clip="cup" borderClassName="">
         <div className={CLIP_BOX_CLASSNAME.cup}>
-          <CupClip ref={cupRef} onReady={() => onClipReady("cup")} />
+          <CupClip ref={cupRef} onReady={() => notifyReady("cup")} />
         </div>
       </ClipBay>
     </div>

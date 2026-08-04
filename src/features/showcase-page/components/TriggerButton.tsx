@@ -2,22 +2,22 @@ import { useEffect, useRef, useState } from "react";
 
 import { BLOCKED_SHAKE_MS, LEGAL_POP_MS } from "../showcase-page.data";
 import type { ClipKey, ClipTrigger } from "../showcase-page.types";
-import { wipeDurationMs } from "../showcase-page.utils";
+import { useShowcaseStore } from "../store/showcase-store";
+import { selectActivationGen } from "../store/showcase-store.selectors";
+import { durationFor } from "../utils/duration";
 import { TriggerBorderWipe } from "./TriggerBorderWipe";
 
 interface TriggerButtonProps {
   clip: ClipKey;
   trigger: ClipTrigger;
   label: string;
-  /** Derived from clip *Playing state. */
+  /** True exactly while this clip is playing this trigger. */
   lit: boolean;
-  /** Bumped on every trigger fire; restarts the border-wipe animation. */
-  activationGen: number;
   shaking: boolean;
   popping: boolean;
   /** Bumped on every blocked click; replays shake/pop without remounting the button. */
   blockedGen?: number;
-  onFire: (trigger: ClipTrigger) => void;
+  onFire: () => void;
 }
 
 /** Restarts a CSS animation in place via a reflow, no element remount needed. */
@@ -33,12 +33,12 @@ export function TriggerButton({
   trigger,
   label,
   lit,
-  activationGen,
   shaking,
   popping,
   blockedGen,
   onFire,
 }: TriggerButtonProps) {
+  const activationGen = useShowcaseStore(selectActivationGen);
   const [pressed, setPressed] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
@@ -72,7 +72,7 @@ export function TriggerButton({
       onPointerUp={() => setPressed(false)}
       onPointerLeave={() => setPressed(false)}
       onPointerCancel={() => setPressed(false)}
-      onClick={() => onFire(trigger)}
+      onClick={onFire}
       className={[
         "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
         lit ? "text-[#22d3ee]" : "text-[#c6cdd6] hover:bg-[#171b23]",
@@ -84,7 +84,7 @@ export function TriggerButton({
       {lit && (
         <TriggerBorderWipe
           activationGen={activationGen}
-          durationMs={wipeDurationMs(clip, trigger)}
+          durationMs={durationFor(clip, trigger)}
         />
       )}
       <span ref={labelRef} className="relative">

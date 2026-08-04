@@ -2,21 +2,26 @@ export const CLIP_KEYS = ["court", "card", "cup"] as const;
 export type ClipKey = (typeof CLIP_KEYS)[number];
 export type ClipTrigger = "scene1" | "scene2" | "finish";
 
-/** Ordered story beats — source of truth for transitions. */
-export const STORY_STEPS = [
-  "boot",
-  "courtScene1",
-  "cardScene1",
-  "cardScene2",
-  "cupScene1",
-  "cupScene2",
-  "reset",
-] as const;
-
-export type StoryStep = (typeof STORY_STEPS)[number];
-
-/** Story cursor. `running: true` = in progress; `false` = settled. */
-export type StepState = { step: StoryStep; running: boolean };
+/**
+ * A single clip's whole world. `step` indexes into that clip's SEQUENCE and is
+ * the only thing that decides what it will accept next — no global cursor.
+ */
+export interface ClipState {
+  step: number;
+  /**
+   * The trigger playing right now, or null when idle. Doubles as the "busy"
+   * flag and as the lit indicator, so the two can never disagree.
+   */
+  playing: ClipTrigger | null;
+  /** False until the Rive file has loaded and its triggers are bound. */
+  ready: boolean;
+  /**
+   * True once this clip has been reset for the current cycle. Autoplay skips
+   * it until the next cycle starts, which is what lets a manual reset drop a
+   * clip out of the cycle instead of replaying it.
+   */
+  cycleDone: boolean;
+}
 
 export interface StepBeat {
   clip: ClipKey;
@@ -27,7 +32,8 @@ export interface StepBeat {
 export interface BlockedAttempt {
   clip: ClipKey;
   illegalTrigger: ClipTrigger;
-  legalTrigger: ClipTrigger;
+  /** Null when the clip is busy or still loading — nothing to point at. */
+  legalTrigger: ClipTrigger | null;
   gen: number;
 }
 

@@ -3,68 +3,30 @@ import {
   type BuildDecision,
   type ClipKey,
   type ClipTrigger,
-  type StepBeat,
-  type StepState,
-  type StoryStep,
 } from "./showcase-page.types";
 
-export const BOOT_STATE: StepState = { step: "boot", running: false };
-
-/** Rive fires for each story step (`boot` has none). */
-export const STEP_BEATS: Record<StoryStep, StepBeat[]> = {
-  boot: [],
-  courtScene1: [{ clip: "court", trigger: "scene1" }],
-  cardScene1: [{ clip: "card", trigger: "scene1" }],
-  cardScene2: [{ clip: "card", trigger: "scene2" }],
-  cupScene1: [{ clip: "cup", trigger: "scene1" }],
-  cupScene2: [{ clip: "cup", trigger: "scene2" }],
-  reset: [
-    { clip: "court", trigger: "finish" },
-    { clip: "card", trigger: "finish" },
-    { clip: "cup", trigger: "finish" },
-  ],
+/**
+ * How long each clip plays a given trigger. Drives both the "busy" window that
+ * protects an animation from being interrupted and the trigger button's border
+ * wipe, so the two can never disagree.
+ */
+export const CLIP_DURATION_MS: Record<
+  ClipKey,
+  Partial<Record<ClipTrigger, number>>
+> = {
+  court: { scene1: 1200, finish: 700 },
+  card: { scene1: 650, scene2: 650, finish: 700 },
+  cup: { scene1: 3000, scene2: 3500, finish: 700 },
 };
+
+/** Pause between each autoplay beat. */
+export const STEP_PAUSE_MS = 400;
 
 /**
- * How long each step stays `running: true`.
- * `boot` is the cycle-start pause; reset uses the longest finish duration.
+ * Breath after every clip has reset, before the next cycle's first fire.
+ * Together with STEP_PAUSE_MS this reproduces the old tail + boot hold.
  */
-export const STEP_DURATION_MS: Record<StoryStep, number> = {
-  boot: 1300,
-  courtScene1: 1200,
-  cardScene1: 650,
-  cardScene2: 650,
-  cupScene1: 2900,
-  cupScene2: 3500,
-  reset: 700,
-};
-
-/** Bay scene button → story step (manual reset is separate). */
-export const SCENE_TO_STEP: Record<
-  ClipKey,
-  Partial<Record<Extract<ClipTrigger, "scene1" | "scene2">, StoryStep>>
-> = {
-  court: { scene1: "courtScene1" },
-  card: { scene1: "cardScene1", scene2: "cardScene2" },
-  cup: { scene1: "cupScene1", scene2: "cupScene2" },
-};
-
-/** Bay-tint lane per story step. `-1` = no tint (reset). */
-export const STEP_BAY_FOCUS: Record<StoryStep, number> = {
-  boot: 0,
-  courtScene1: 0,
-  cardScene1: 1,
-  cardScene2: 1,
-  cupScene1: 2,
-  cupScene2: 2,
-  reset: -1,
-};
-
-/** Hold on reset settled before the next cycle's `boot` step. */
-export const CYCLE_TAIL_MS = 300;
-
-/** Pause between each story step during autoplay. */
-export const STEP_PAUSE_MS = 400;
+export const CYCLE_PAUSE_MS = 1200;
 
 /** How long the illegal button shakes on a blocked click. */
 export const BLOCKED_SHAKE_MS = 250;

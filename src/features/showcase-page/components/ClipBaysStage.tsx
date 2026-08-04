@@ -3,12 +3,11 @@ import { motion } from "motion/react";
 
 import { useStickyStuck } from "../hooks/useStickyStuck";
 import { HERO_TITLE } from "../showcase-page.data";
+import { useShowcaseStore } from "../store/showcase-store";
+import { selectIsPaused } from "../store/showcase-store.selectors";
 import { AutoLoopButton } from "./AutoLoopButton";
 
 interface ClipBaysStageProps {
-  paused: boolean;
-  onPause: () => void;
-  onResume: () => void;
   children: ReactNode;
 }
 
@@ -16,12 +15,10 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const titleWordCount = HERO_TITLE.split(" ").length;
 
 /** Clip bays + their Auto loop control. Sticky on mobile while the stage is in view. */
-export function ClipBaysStage({
-  paused,
-  onPause,
-  onResume,
-  children,
-}: ClipBaysStageProps) {
+export function ClipBaysStage({ children }: ClipBaysStageProps) {
+  const paused = useShowcaseStore(selectIsPaused);
+  const pause = useShowcaseStore((store) => store.pause);
+  const resume = useShowcaseStore((store) => store.resume);
   const stickySentinelRef = useRef<HTMLDivElement>(null);
   const stuck = useStickyStuck(stickySentinelRef);
 
@@ -45,8 +42,8 @@ export function ClipBaysStage({
       >
         <AutoLoopButton
           paused={paused}
-          onPause={onPause}
-          onResume={onResume}
+          onPause={pause}
+          onResume={resume}
           elevated={stuck}
         />
       </motion.div>

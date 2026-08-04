@@ -44,8 +44,9 @@ export function InsideTheFile() {
         slides={[{ src: RIVE_SCREENSHOT_SRC, alt: RIVE_SCREENSHOT_ALT }]}
         plugins={[Zoom]}
         carousel={{ finite: true }}
+        // Backdrop clicks close it. An `on.click` handler would also fire for
+        // taps on the image itself, eating the first half of a double-tap zoom.
         controller={{ closeOnBackdropClick: true }}
-        on={{ click: () => setOpen(false) }}
         render={{
           buttonPrev: () => null,
           buttonNext: () => null,

@@ -1,11 +1,14 @@
 import { type ReactNode } from "react";
 
 import { BAY_TINT_TRANSITION_MS } from "../showcase-page.data";
-import type {
-  BlockedAttempt,
-  ClipKey,
-  ClipTrigger,
-} from "../showcase-page.types";
+import type { ClipKey, ClipTrigger } from "../showcase-page.types";
+import { useShowcaseStore } from "../store/showcase-store";
+import {
+  selectBlocked,
+  selectClip,
+  selectTint,
+} from "../store/showcase-store.selectors";
+import { litTriggerFor } from "../utils/bay";
 import { TriggerButton } from "./TriggerButton";
 
 interface ClipBayProps {
@@ -14,16 +17,7 @@ interface ClipBayProps {
   sizeLabel: string;
   description: string;
   triggers: Array<{ label: string; trigger: ClipTrigger }>;
-  /** 0–1 soft wash strength; crossfades as autoplay focus moves. */
-  tint: number;
-  /** Derived from clip *Playing state. */
-  litTrigger?: ClipTrigger;
-  /** Bumped on every trigger fire; restarts the border-wipe animation. */
-  activationGen: number;
-  /** Set when the user just tapped a currently-illegal trigger on any bay. */
-  blockedAttempt: BlockedAttempt | null;
   borderClassName: string;
-  onFire: (trigger: ClipTrigger) => void;
   children: ReactNode;
 }
 
@@ -33,14 +27,18 @@ export function ClipBay({
   sizeLabel,
   description,
   triggers,
-  tint,
-  litTrigger,
-  activationGen,
-  blockedAttempt,
   borderClassName,
-  onFire,
   children,
 }: ClipBayProps) {
+  // Subscribing per clip means a bay only re-renders for its own animation.
+  const state = useShowcaseStore(selectClip(clip));
+  const tint = useShowcaseStore(selectTint(clip));
+  const blocked = useShowcaseStore(selectBlocked);
+  const fire = useShowcaseStore((store) => store.fire);
+
+  const litTrigger = litTriggerFor(state);
+  const isBlockedTarget = blocked?.clip === clip;
+
   return (
     <div
       className={`flex min-w-0 flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 ${borderClassName}`}
@@ -67,23 +65,19 @@ export function ClipBay({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {triggers.map(({ label, trigger }) => {
-          const isBlockedTarget = blockedAttempt?.clip === clip;
-          return (
-            <TriggerButton
-              key={label}
-              clip={clip}
-              trigger={trigger}
-              label={label}
-              lit={litTrigger === trigger}
-              activationGen={activationGen}
-              shaking={isBlockedTarget && blockedAttempt.illegalTrigger === trigger}
-              popping={isBlockedTarget && blockedAttempt.legalTrigger === trigger}
-              blockedGen={blockedAttempt?.gen}
-              onFire={onFire}
-            />
-          );
-        })}
+        {triggers.map(({ label, trigger }) => (
+          <TriggerButton
+            key={label}
+            clip={clip}
+            trigger={trigger}
+            label={label}
+            lit={litTrigger === trigger}
+            shaking={isBlockedTarget && blocked.illegalTrigger === trigger}
+            popping={isBlockedTarget && blocked.legalTrigger === trigger}
+            blockedGen={blocked?.gen}
+            onFire={() => fire(clip, trigger, "user")}
+          />
+        ))}
       </div>
     </div>
   );
