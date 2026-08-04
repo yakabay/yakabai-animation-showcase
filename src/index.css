@@ -65,14 +65,14 @@ body {
 }
 
 @keyframes triggerPopShadow {
-  20% {
+  15% {
     background-color: #171b23;
-    box-shadow: 0 0 10px rgb(34 211 238 / 0.35);
+    box-shadow: 0 0 10px rgba(87, 207, 225, 0.75);
   }
 }
 
 @keyframes triggerPopText {
-  20% {
+  15% {
     transform: scale(1.12);
     color: #22d3ee;
   }

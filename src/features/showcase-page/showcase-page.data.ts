@@ -16,7 +16,7 @@ export const CLIP_DURATION_MS: Record<
 > = {
   court: { scene1: 1200, finish: 700 },
   card: { scene1: 650, scene2: 650, finish: 700 },
-  cup: { scene1: 3000, scene2: 3500, finish: 700 },
+  cup: { scene1: 3000, scene2: 3600, finish: 700 },
 };
 
 /** Pause between each autoplay beat. */
@@ -32,7 +32,7 @@ export const CYCLE_PAUSE_MS = 1200;
 export const BLOCKED_SHAKE_MS = 250;
 
 /** How long the actionable button pops, right after the shake finishes. */
-export const LEGAL_POP_MS = 1000;
+export const LEGAL_POP_MS = 1300;
 
 /** Soft crossfade duration for the bay tint as focus moves court → card → cup. */
 export const BAY_TINT_TRANSITION_MS = 700;
@@ -98,7 +98,7 @@ export const BUILD_DECISIONS: BuildDecision[] = [
   },
   {
     title: "No race conditions by design",
-    body: "One state controls the entire flow. Switch from autoplay to manual anytime. The result: interactions never collide, and the flow stays reliable under real use.",
+    body: "A single source of truth for the whole flow — one state, one data config, no parallel logic to fall out of sync.",
   },
   {
     title: "No shortcuts on quality",
