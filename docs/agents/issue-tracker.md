@@ -7,7 +7,7 @@ Issues and specs (you may know a spec as a PRD) for this repo live as markdown f
 - One feature per directory: `.scratch/<feature-slug>/`
 - The spec is `.scratch/<feature-slug>/spec.md`
 - Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` — never a single combined tickets file
-- Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
+- Work state is recorded as a `Status:` line near the top of each issue file (wayfinding tickets use `claimed` / `resolved`; this repo has no separate triage label map)
 - Comments and conversation history append to the bottom of the file under a `## Comments` heading
 
 ## When a skill says "publish to the issue tracker"

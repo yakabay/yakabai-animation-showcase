@@ -1,12 +1,14 @@
 # Animation Showcase for an NFT-Based Tennis Prediction Platform
 
-A portfolio piece by **Yaroslav Kabai**: an interactive "How it works" walkthrough
-for an NFT-based tennis prediction product, built with [Rive](https://rive.app) and
-[Motion](https://motion.dev). Three Rive state-machine clips (pick a match → mint your
-prediction card → collect from the reward pool) autoplay through a small finite-state
-machine, with swipe navigation, slide indicators, tab-visibility pausing, and ambient
-animated background blobs. It demonstrates both motion/front-end craft and product
-thinking.
+A portfolio piece by **Yaroslav Kabai**: an interactive onboarding walkthrough for
+an on-chain tennis prediction product, built with [Rive](https://rive.app) and
+[Motion](https://motion.dev). Three Rive state-machine clips (`court.riv` →
+`card.riv` → `cup.riv`) sit in side-by-side bays and autoplay through per-clip
+sequences, with manual trigger buttons, pause/resume, tab-visibility pausing,
+and a lightbox for the Rive editor screenshot. It demonstrates both
+motion/front-end craft and product thinking.
+
+Domain vocabulary and control-flow rules live in [`CONTEXT.md`](./CONTEXT.md).
 
 Ported and rebuilt as a standalone Vite app from a larger project. Not indexed by
 search engines (see `public/robots.txt`).
@@ -14,9 +16,11 @@ search engines (see `public/robots.txt`).
 ## Tech
 
 - **Rive** (`@rive-app/react-canvas`, pinned) — vector state-machine clips driven by triggers
-- **Motion** (formerly Framer Motion) — ambient background motion + entrance transitions
+- **Motion** (formerly Framer Motion) — entrance / in-view transitions
+- **Zustand** — showcase page state (clips, mode, focus, blocked clicks)
 - **Vite** + **React 19** + **TypeScript**
 - **Tailwind CSS v4**
+- **Vitest** + **oxlint**
 
 ## Run locally
 
@@ -26,6 +30,15 @@ npm run dev
 ```
 
 Open http://localhost:5173.
+
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npm run build` | `tsc -b` then production build |
+| `npm run preview` | Preview the production build |
+| `npm run test` | Vitest (unit tests under `src/**/*.test.ts`) |
+| `npm run test:watch` | Vitest watch mode |
+| `npm run lint` | oxlint |
 
 ## Architecture
 
@@ -39,34 +52,34 @@ actually shared.
 
 ```
 src/
-  App.tsx                 # page shell: header, showcase, footer
-  index.css               # Tailwind v4 + custom utilities/animations
+  App.tsx                          # mounts ShowcasePage
+  index.css                        # Tailwind v4 + theme fonts
   lib/
-    cn.ts                 # classnames helper
-    asset.ts              # BASE_URL-aware asset path
+    cn.ts                          # classnames helper
+    asset.ts                       # BASE_URL-aware asset path
   features/
-    animation-showcase/
-      AnimationShowcase.tsx        # orchestrates the piece
-      animation-showcase.data.ts   # step copy, sizing, layout constants
-      components/
-        animations/                # the Rive layer + its backdrop
-          RiveStage.tsx             # cross-fades the 3 clips
-          CourtClip.tsx / CardClip.tsx / CupClip.tsx
-          StageGlow.tsx
-          BackgroundEffects.tsx
-          AmbientBlobs.tsx
-        ui/                         # chrome/framing around the animation
-          SectionTitle.tsx
-          StepText.tsx
-          SlideIndicator.tsx
+    showcase-page/
+      ShowcasePage.tsx             # page shell: header → hero → bays → copy → footer
+      showcase-page.data.ts        # timing, copy, clip box sizes, footer meta
+      showcase-page.types.ts       # ClipKey / ClipState / triggers
+      showcase-page.motion.ts      # shared Motion variants
+      store/                       # Zustand store, actions, selectors, runtime emitter
+      utils/                       # sequence, autoplay, legality, clips, bay, duration
       hooks/
-        useAutoPlayLoop.ts          # the finite-state machine
-        usePageVisible.ts           # pauses playback when the tab is hidden
-        useHorizontalSwipe.ts       # swipe navigation
-        useClipBucketSize.ts        # responsive canvas sizing
+        useAutoLoop.ts             # schedules nextAutoAction while mode is auto
+        usePageVisible.ts          # pauses the loop when the tab is hidden
+        useStickyStuck.ts          # sticky AutoLoopButton elevation
+      components/
+        ClipBaysStage.tsx / ClipBays.tsx / ClipBay.tsx
+        clips/                     # CourtClip / CardClip / CupClip
+        TriggerButton.tsx / TriggerBorderWipe.tsx / AutoLoopButton.tsx
+        HeaderBar.tsx / Hero.tsx / BrandMark.tsx
+        BuildDecisions.tsx / InsideTheFile.tsx / SiteFooter.tsx
 public/
-  court.riv  card.riv  cup.riv
+  court.riv  card.riv  cup.riv  rive-screenshot.png
 ```
+
+Path alias: `@/` → `src/` (see `vite.config.ts`).
 
 ---
 

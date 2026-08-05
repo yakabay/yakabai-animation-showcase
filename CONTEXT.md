@@ -10,7 +10,7 @@ Portfolio case study for interactive Rive onboarding clips (`court.riv`, `card.r
 | Clip state | Per-clip SoT `{ step, playing, ready, cycleDone }`. `step` indexes that clip’s `SEQUENCE`; `playing` is the busy/lit trigger (or `null` when idle). |
 | Clip duration | `CLIP_DURATION_MS` — how long a trigger stays `playing`. Same value drives the busy gate and the border wipe. |
 | Auto pauses | `STEP_PAUSE_MS` between autoplay beats; `CYCLE_PAUSE_MS` after a cycle completes before the next run. Kept next to `CLIP_DURATION_MS` in `showcase-page.data.ts`. |
-| Sequence | Each clip’s allowed trigger order (`SEQUENCE`): court `scene1` → `finish`; card `scene1` → `scene2` → `finish`; cup `scene1` → `scene2` → `finish`. |
+| Sequence | Each clip’s allowed trigger order (`SEQUENCE` in `utils/sequence.ts`): court `scene1` → `finish`; card `scene1` → `scene2` → `finish`; cup `scene1` → `scene2` → `finish`. |
 | Lit trigger | Derived from that clip’s `playing` — never a parallel map. |
 | Bay tint | Cyan wash on the focused bay during autoplay; cleared in manual mode and during multi-clip reset. |
 | Auto loop | Walks owed clips via `nextAutoAction` (no global cursor). Pause freezes scheduling; Resume continues from current clip states. Any bay click stops autoplay (illegal clicks stop it but do not fire). |
@@ -24,9 +24,9 @@ Portfolio case study for interactive Rive onboarding clips (`court.riv`, `card.r
 ```
 CLIP_DURATION_MS + STEP_PAUSE_MS / CYCLE_PAUSE_MS
         ↓
-   Clips map (per-clip ClipState)  →  nextAutoAction / isLegal
+   Zustand store clips map (per-clip ClipState)  →  nextAutoAction / isLegal
         ↓
-   Rive fire  +  button highlight (from playing)
+   Rive fire (via store emitter)  +  button highlight (from playing)
 ```
 
 ## Avoid
