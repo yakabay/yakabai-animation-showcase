@@ -40,6 +40,9 @@ export const CupClip = forwardRef<CupClipRef, CupClipProps>(
       {
         useOffscreenRenderer: true,
         shouldResizeCanvasToContainer: true,
+        // Keep SM advancing when the bay is scrolled offscreen — otherwise
+        // wall-clock settle timers race ahead of a frozen Rive loop.
+        shouldUseIntersectionObserver: false,
       }
     );
 

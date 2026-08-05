@@ -39,9 +39,11 @@ export const CardClip = forwardRef<CardClipRef, CardClipProps>(
         shouldDisableRiveListeners: false,
       },
       {
-        // Performance optimizations for mobile
         useOffscreenRenderer: true,
         shouldResizeCanvasToContainer: true,
+        // Keep SM advancing when the bay is scrolled offscreen — otherwise
+        // wall-clock settle timers race ahead of a frozen Rive loop.
+        shouldUseIntersectionObserver: false,
       }
     );
 
