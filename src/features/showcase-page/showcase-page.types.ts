@@ -23,11 +23,6 @@ export interface ClipState {
   cycleDone: boolean;
 }
 
-export interface StepBeat {
-  clip: ClipKey;
-  trigger: ClipTrigger;
-}
-
 /** An illegal click: which button was tapped vs. which one is actually actionable. */
 export interface BlockedAttempt {
   clip: ClipKey;

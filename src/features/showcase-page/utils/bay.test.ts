@@ -12,7 +12,7 @@ describe("bayIndexForClip", () => {
 });
 
 describe("bayTintWeight", () => {
-  it("is full at the focused bay and gone a bay away", () => {
+  it("is full only on the focused bay", () => {
     expect(bayTintWeight(1, 1)).toBe(1);
     expect(bayTintWeight(0, 1)).toBe(0);
     expect(bayTintWeight(2, 0)).toBe(0);

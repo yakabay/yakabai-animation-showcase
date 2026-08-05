@@ -10,10 +10,10 @@ export function bayIndexForClip(clip: ClipKey): number {
   return CLIP_KEYS.indexOf(clip);
 }
 
-/** Soft wash strength: full at the focused bay, falling off across neighbours. */
+/** Tint weight: 1 on the focused bay, 0 on every other bay (and when unfocused). */
 export function bayTintWeight(clipIndex: number, focus: number | null): number {
   if (focus === null) return 0;
-  return Math.max(0, 1 - Math.abs(clipIndex - focus));
+  return clipIndex === focus ? 1 : 0;
 }
 
 /**

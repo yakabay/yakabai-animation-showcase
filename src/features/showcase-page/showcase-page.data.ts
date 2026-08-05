@@ -6,9 +6,10 @@ import {
 } from "./showcase-page.types";
 
 /**
- * How long each clip plays a given trigger. Drives both the "busy" window that
- * protects an animation from being interrupted and the trigger button's border
- * wipe, so the two can never disagree.
+ * Timing triad — keep these three together.
+ * - CLIP_DURATION_MS: busy window + border wipe for a fired trigger
+ * - STEP_PAUSE_MS: gap between autoplay beats once a clip has settled
+ * - CYCLE_PAUSE_MS: breath after cycleComplete before the next cycle starts
  */
 export const CLIP_DURATION_MS: Record<
   ClipKey,
@@ -18,14 +19,7 @@ export const CLIP_DURATION_MS: Record<
   card: { scene1: 650, scene2: 650, finish: 700 },
   cup: { scene1: 3000, scene2: 3600, finish: 700 },
 };
-
-/** Pause between each autoplay beat. */
 export const STEP_PAUSE_MS = 400;
-
-/**
- * Breath after every clip has reset, before the next cycle's first fire.
- * Together with STEP_PAUSE_MS this reproduces the old tail + boot hold.
- */
 export const CYCLE_PAUSE_MS = 1200;
 
 /** How long the illegal button shakes on a blocked click. */
@@ -38,7 +32,7 @@ export const LEGAL_POP_MS = 1300;
 export const BAY_TINT_TRANSITION_MS = 700;
 
 export const BRAND_NAME = "Yaroslav Kabai";
-export const BRAND_ROLE = "Product Engineer";
+export const BRAND_ROLE = "Software Engineer";
 
 export const HERO_TITLE = "Interactive onboarding your users won't skip.";
 export const HERO_SUBHEAD =

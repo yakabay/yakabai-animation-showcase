@@ -1,4 +1,5 @@
 import type { ClipKey, ClipTrigger } from "../showcase-page.types";
+import { nextAutoAction } from "../utils/autoplay";
 import { bayIndexForClip } from "../utils/bay";
 import { fireClip, markReady, settleClip, startCycle } from "../utils/clips";
 import { durationFor } from "../utils/duration";
@@ -8,46 +9,26 @@ import type {
   ShowcaseActions,
   ShowcaseStore,
 } from "./showcase-store";
+import {
+  clearSettleTimers,
+  emitTrigger,
+  nextBlockedGen,
+  scheduleSettle,
+  setEmitter,
+} from "./showcase-runtime";
+
+export { clearSettleTimers, setEmitter };
 
 type Set = (fn: (state: ShowcaseStore) => Partial<ShowcaseStore>) => void;
 type Get = () => ShowcaseStore;
 
-/**
- * Rive handles live outside the store — they are imperative and must not
- * trigger renders. Registered once by ShowcasePage.
- */
-type Emitter = (clip: ClipKey, trigger: ClipTrigger) => void;
-let emit: Emitter | null = null;
-
-const settleTimers = new Map<ClipKey, ReturnType<typeof setTimeout>>();
-
-export function setEmitter(next: Emitter | null): void {
-  emit = next;
-}
-
-/** Drop every pending settle — used when the page unmounts. */
-export function clearSettleTimers(): void {
-  for (const timer of settleTimers.values()) clearTimeout(timer);
-  settleTimers.clear();
-}
-
-let blockedGen = 0;
-
 export function createActions(set: Set, get: Get): ShowcaseActions {
   /** Play it for real, hold the clip busy for exactly as long as it runs. */
   function play(clip: ClipKey, trigger: ClipTrigger): void {
-    emit?.(clip, trigger);
-
-    const existing = settleTimers.get(clip);
-    if (existing) clearTimeout(existing);
-
-    settleTimers.set(
-      clip,
-      setTimeout(() => {
-        settleTimers.delete(clip);
-        set((state) => ({ clips: settleClip(state.clips, clip) }));
-      }, durationFor(clip, trigger))
-    );
+    emitTrigger(clip, trigger);
+    scheduleSettle(clip, durationFor(clip, trigger), () => {
+      set((state) => ({ clips: settleClip(state.clips, clip) }));
+    });
   }
 
   return {
@@ -67,7 +48,7 @@ export function createActions(set: Set, get: Get): ShowcaseActions {
             clip,
             illegalTrigger: trigger,
             legalTrigger: legalTriggerFor(clip, state.clips[clip]),
-            gen: ++blockedGen,
+            gen: nextBlockedGen(),
           },
         }));
         if (typeof navigator !== "undefined" && navigator.vibrate) {
@@ -112,7 +93,11 @@ export function createActions(set: Set, get: Get): ShowcaseActions {
     },
 
     resume() {
-      set(() => ({ mode: "auto" }));
+      const { clips } = get();
+      const action = nextAutoAction(clips);
+      const focus =
+        action.kind === "fire" ? bayIndexForClip(action.clip) : null;
+      set(() => ({ mode: "auto", focus }));
     },
   };
 }

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CLIP_KEYS, type ClipKey, type ClipTrigger } from "../showcase-page.types";
 import { markReady } from "../utils/clips";
+import { durationFor } from "../utils/duration";
 import { phaseAt } from "../utils/sequence";
 import { createInitialState, useShowcaseStore } from "./showcase-store";
 import { clearSettleTimers, setEmitter } from "./showcase-store.actions";
@@ -48,7 +49,8 @@ describe("fire — accepted", () => {
     fire("cup", "scene1", "user");
     expect(store().clips.cup.playing).toBe("scene1");
 
-    vi.advanceTimersByTime(2899);
+    const ms = durationFor("cup", "scene1");
+    vi.advanceTimersByTime(ms - 1);
     expect(store().clips.cup.playing).toBe("scene1");
 
     vi.advanceTimersByTime(1);
@@ -116,12 +118,14 @@ describe("mode", () => {
     expect(store().focus).toBe(2);
   });
 
-  it("returns to auto on resume", () => {
+  it("returns to auto on resume and tints the next owed bay", () => {
     store().pause();
     expect(store().mode).toBe("manual");
+    expect(store().focus).toBeNull();
 
     store().resume();
     expect(store().mode).toBe("auto");
+    expect(store().focus).toBe(0);
   });
 });
 
