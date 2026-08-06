@@ -74,7 +74,7 @@ export function TriggerButton({
       onPointerCancel={() => setPressed(false)}
       onClick={onFire}
       className={[
-        "relative cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
+        "relative overflow-visible cursor-pointer rounded-[5px] border border-[#2a3038] bg-[#101318] px-[13px] py-2 font-mono text-xs tracking-[0.06em] select-none touch-manipulation transition-[transform,box-shadow,background-color] duration-150 ease-out",
         lit ? "text-[#22d3ee]" : "text-[#c6cdd6] hover:bg-[#171b23]",
         pressed
           ? "scale-[0.97] translate-y-px bg-[#0d1016] shadow-[inset_0_2px_6px_rgba(0,0,0,0.45)]"
