@@ -73,6 +73,7 @@ export function TriggerBorderWipe({
           fill="none"
           stroke={STROKE}
           strokeWidth={STROKE_WIDTH}
+          strokeLinecap="round"
           pathLength={1}
           strokeDasharray="1 1"
           style={{ animation: `borderWipe ${durationMs}ms linear forwards` }}

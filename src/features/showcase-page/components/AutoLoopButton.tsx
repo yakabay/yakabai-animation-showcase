@@ -7,7 +7,7 @@ interface AutoLoopButtonProps {
 }
 
 const CONTROL_CLASS =
-  "relative flex h-[34px] w-[108px] shrink-0 cursor-pointer items-center rounded-md border p-0 font-mono text-[11px] tracking-[0.14em] uppercase transition-[box-shadow,colors,background-color] duration-200 ease-out";
+  "relative flex h-[34px] w-[108px] shrink-0 cursor-pointer items-center overflow-visible rounded-md border p-0 font-mono text-[11px] tracking-[0.14em] uppercase transition-[box-shadow,colors,background-color] duration-200 ease-out";
 
 const ELEVATED_SHADOW =
   "shadow-[0_6px_16px_rgb(34_211_238_/_0.32),0_1px_5px_rgb(34_211_238_/_0.2)]";
@@ -54,7 +54,7 @@ export function AutoLoopButton({
         viewBox="0 0 108 34"
         fill="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute -inset-px overflow-visible"
       >
         <rect
           x="0.5"
